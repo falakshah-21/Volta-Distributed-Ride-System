@@ -1,0 +1,217 @@
+﻿@page "/"
+@inject NavigationManager Nav
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorage
+@inject HttpClient Http
+@using System.Net.Http.Headers
+@using System.Net.Http.Json
+
+<div class="container mt-5" style="max-width: 900px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold" style="color: #1e1e2f;">⚡ Volta Dashboard</h2>
+            <span class="badge bg-secondary">@userRole</span>
+        </div>
+        <button class="btn btn-sm btn-outline-dark" @onclick="Logout">Sign Out</button>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
+    }
+    else
+    {
+        // --- LOGIC: IF I HAVE AN ACTIVE RIDE, SHOW IT. IGNORE EVERYTHING ELSE. ---
+        @if (currentActiveRide != null)
+        {
+            <div class="card shadow-lg border-0 mb-4" style="border-left: 6px solid #28a745;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="text-success fw-bold">
+                                @(userRole == "Driver" ? "🚖 Current Job" : "🚗 Ride Status")
+                            </h4>
+                            <div class="text-muted small mb-2">Ref: #@currentActiveRide.Id</div>
+                        </div>
+                        <h2 class="fw-bold text-dark">Rs. @currentActiveRide.Price</h2>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-7">
+                            <h5 class="mb-1">📍 @currentActiveRide.PickupLocation</h5>
+                            <h5 class="mb-1">🏁 @currentActiveRide.DropoffLocation</h5>
+                            <div class="mt-3">
+                                @if (currentActiveRide.Status == "Requested")
+                                {
+                                    <span class="badge bg-warning text-dark px-3 py-2">🔍 Finding Driver...</span>
+                                }
+                                else if (currentActiveRide.Status == "Accepted")
+                                {
+                                    <span class="badge bg-success px-3 py-2">✅ On the way!</span>
+                                    @if (!string.IsNullOrEmpty(currentActiveRide.DriverName))
+                                    {
+                                        <div class="mt-2 small text-muted">Driver: <strong>@currentActiveRide.DriverName</strong></div>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <div class="col-md-5 text-end d-flex flex-column gap-2">
+                            @if (userRole == "Driver" && currentActiveRide.Status == "Accepted")
+                            {
+                                <button class="btn btn-success fw-bold py-2" @onclick="CompleteRide">✅ Finish Ride</button>
+                            }
+
+                            <button class="btn btn-outline-danger" @onclick="CancelRide">❌ Cancel Ride</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        // --- LOGIC: IF NO ACTIVE RIDE, SHOW "AVAILABLE RIDES" (Driver) OR "BOOK NEW" (Passenger) ---
+        else
+        {
+            @if (userRole == "Driver")
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white d-flex justify-content-between">
+                        <h5 class="mb-0">📡 Available Requests</h5>
+                        <button class="btn btn-sm btn-outline-light" @onclick="LoadAvailableRides">🔄 Refresh</button>
+                    </div>
+                    <div class="card-body p-0">
+                        @if (availableRides.Count == 0)
+                        {
+                            <div class="p-5 text-center text-muted">
+                                <h5>💤 No passengers nearby.</h5>
+                                <p>We will auto-refresh every few seconds.</p>
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="bg-light"><tr><th class="ps-4">Route</th><th>Price</th><th>Action</th></tr></thead>
+                                <tbody>
+                                    @foreach (var ride in availableRides)
+                                    {
+                                        <tr>
+                                            <td class="ps-4">
+                                                <div class="fw-bold">@ride.PickupLocation</div>
+                                                <div class="small text-muted">to @ride.DropoffLocation</div>
+                                            </td>
+                                            <td class="fw-bold text-success">Rs. @ride.Price</td>
+                                            <td>
+                                                <button class="btn btn-primary btn-sm px-3" @onclick="() => AcceptRide(ride.Id)">✋ Accept</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+            }
+            else // PASSENGER
+            {
+                <div class="text-center py-5 bg-white shadow-sm rounded">
+                    <h3 class="fw-bold text-muted">Ready to go?</h3>
+                    <p class="text-muted mb-4">Book a ride instantly with our secure network.</p>
+                    <button class="btn btn-primary btn-lg px-5 shadow" @onclick='() => Nav.NavigateTo("/book")'>
+                        🚗 Book a New Ride
+                    </button>
+                </div>
+            }
+        }
+    }
+</div>
+
+@code {
+    private string userRole = "Guest";
+    private bool isLoading = true;
+    private List<RideDto> availableRides = new();
+    private RideDto currentActiveRide = null;
+    private System.Threading.Timer? _timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var token = await SessionStorage.GetItemAsync<string>("authToken");
+        if (string.IsNullOrEmpty(token)) { Nav.NavigateTo("/login"); return; }
+
+        userRole = await SessionStorage.GetItemAsync<string>("userRole") ?? "Guest";
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        await RefreshDashboard();
+        isLoading = false;
+
+        // Auto-Refresh every 3 seconds
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            await InvokeAsync(async () =>
+            {
+                // Only refresh if we are on this page
+                if (Nav.Uri == Nav.BaseUri)
+                {
+                    await RefreshDashboard();
+                    StateHasChanged();
+                }
+            });
+        }, null, 3000, 3000);
+    }
+
+    public void Dispose() => _timer?.Dispose();
+
+    private async Task RefreshDashboard()
+    {
+        try
+        {
+            // 1. Check Active Ride
+            // IMPORTANT: Sending request to GATEWAY (5000) or RIDE (5002). Using 5002 for direct test.
+            var activeRes = await Http.GetAsync("http://localhost:5002/ride/my-active");
+            if (activeRes.IsSuccessStatusCode && activeRes.StatusCode != System.Net.HttpStatusCode.NoContent)
+            {
+                currentActiveRide = await activeRes.Content.ReadFromJsonAsync<RideDto>();
+            }
+            else
+            {
+                currentActiveRide = null;
+            }
+
+            // 2. Logic: If I am a Driver AND I have NO active ride, fetch pending
+            if (userRole == "Driver" && currentActiveRide == null)
+            {
+                availableRides = await Http.GetFromJsonAsync<List<RideDto>>("http://localhost:5002/ride/pending");
+            }
+            else
+            {
+                // Clear the list so I don't see ghosts
+                availableRides.Clear();
+            }
+        }
+        catch { }
+    }
+
+    private async Task LoadAvailableRides() => await RefreshDashboard();
+
+    private async Task AcceptRide(int rideId)
+    {
+        var res = await Http.PutAsync($"http://localhost:5002/ride/accept/{rideId}", null);
+        if (res.IsSuccessStatusCode) await RefreshDashboard();
+    }
+
+    private async Task CancelRide()
+    {
+        if (currentActiveRide == null) return;
+        var res = await Http.PutAsync($"http://localhost:5002/ride/cancel/{currentActiveRide.Id}", null);
+        if (res.IsSuccessStatusCode) await RefreshDashboard();
+    }
+
+    private async Task CompleteRide()
+    {
+        if (currentActiveRide == null) return;
+        var res = await Http.PutAsync($"http://localhost:5002/ride/complete/{currentActiveRide.Id}", null);
+        if (res.IsSuccessStatusCode) await RefreshDashboard();
+    }
+
+    private async Task Logout() { _timer?.Dispose(); await SessionStorage.ClearAsync(); Nav.NavigateTo("/login"); }
+
+    public class RideDto { public int Id { get; set; } public string PickupLocation { get; set; } public string DropoffLocation { get; set; } public decimal Price { get; set; } public string Status { get; set; } public string DriverName { get; set; } }
+}

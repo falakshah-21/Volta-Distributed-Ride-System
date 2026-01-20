@@ -1,0 +1,6 @@
+@Volta.Services.Auth_HostAddress = http://localhost:5006
+
+GET {{Volta.Services.Auth_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

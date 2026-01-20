@@ -1,0 +1,127 @@
+/* --- 1. GLOBAL RESET --- */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    overflow: hidden;
+}
+
+/* --- 2. THE UNIFIED GRADIENT --- */
+:root {
+    /* The exact gradient from your login page */
+    --volta-gradient: linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%);
+    --sidebar-width: 260px;
+    --header-height: 120px;
+}
+
+/* --- 3. LAYOUT CONTAINER --- */
+.page-layout {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* --- 4. THE SEAMLESS L-SHAPE CLASSES --- */
+/* This is the magic part: Both Sidebar and Header use 'fixed' attachment
+   so they share the EXACT same gradient coordinate system. */
+.sidebar, .top-header {
+    background: var(--volta-gradient);
+    background-attachment: fixed; /* <--- MAKES IT LOOK LIKE ONE PIECE */
+    color: white;
+}
+
+/* --- 5. SIDEBAR (Vertical Part) --- */
+.sidebar {
+    width: var(--sidebar-width);
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    /* Remove border-right to blend perfectly */
+    border: none;
+}
+
+/* Top-Left Logo Box */
+.brand-box {
+    height: var(--header-height);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* Semi-transparent line to subtle separate logo */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* --- 6. MAIN CONTENT WRAPPER --- */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* --- 7. TOP HEADER (Horizontal Part) --- */
+.top-header {
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 90;
+    /* Shadow only at bottom */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* --- 8. WHITE CONTENT AREA --- */
+.content-area {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+    position: relative;
+}
+
+/* --- 9. NAV LINKS --- */
+.nav-item a {
+    color: rgba(255,255,255,0.7) !important;
+    padding: 15px 20px;
+    display: block;
+    text-decoration: none;
+    border-left: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+    .nav-item a:hover {
+        color: white !important;
+        background: rgba(255,255,255,0.1);
+    }
+
+    .nav-item a.active {
+        color: white !important;
+        background: rgba(255,255,255,0.2);
+        border-left: 4px solid #00bcd4; /* Teal Accent */
+    }
+
+/* --- UTILITIES --- */
+.divider {
+    height: 3px;
+    width: 40px;
+    background-color: #00bcd4;
+    margin: 8px auto;
+    border-radius: 2px;
+}
+
+/* Buttons also use fixed background to blend in if needed, or just normal gradient */
+.btn-volta {
+    background: var(--volta-gradient);
+    background-attachment: fixed;
+    color: white;
+    border: none;
+}
+
+.bg-volta {
+    background: var(--volta-gradient) !important;
+    background-attachment: fixed !important;
+    color: white !important;
+}

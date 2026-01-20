@@ -1,0 +1,58 @@
+﻿@inherits LayoutComponentBase
+
+<div class="auth-layout">
+    <div class="auth-brand">
+        <div class="content-box">
+            <h1 class="display-3 fw-bold">⚡ VOLTA</h1>
+            <h3 class="mt-3">The Future of City Travel.</h3>
+            <div class="divider"></div>
+            <p class="lead">
+                Secure. Fast. Electric.<br>
+                Join the network that moves at your speed.
+            </p>
+        </div>
+    </div>
+
+    <div class="auth-form-container">
+        @Body
+    </div>
+</div>
+
+<style>
+    .auth-layout {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
+
+    .auth-brand {
+        width: 45%;
+        background: linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .auth-form-container {
+        width: 55%;
+        background-color: #f4f6f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content-box {
+        padding: 4rem;
+    }
+
+    .divider {
+        height: 4px;
+        width: 80px;
+        background-color: #00bcd4;
+        margin: 2rem auto;
+        border-radius: 2px;
+    }
+</style>

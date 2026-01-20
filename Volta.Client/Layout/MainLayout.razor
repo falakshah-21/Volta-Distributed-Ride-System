@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<div class="page-layout">
+
+    <div class="sidebar">
+        <div class="brand-box">
+            <h1 class="fw-bold m-0" style="font-size: 2.5rem;">⚡ VOLTA</h1>
+            <small class="text-white-50 mt-1">The Future of City Travel.</small>
+            <div class="divider"></div>
+        </div>
+
+        <NavMenu />
+    </div>
+
+    <div class="main-wrapper">
+
+        <div class="top-header">
+            <div class="text-center">
+                <h4 class="mb-0 fw-light">Secure. Fast. Electric.</h4>
+                <small class="text-white-50" style="letter-spacing: 1px;">
+                    Join the network that moves at your speed.
+                </small>
+            </div>
+        </div>
+
+        <div class="content-area">
+            @Body
+        </div>
+    </div>
+</div>

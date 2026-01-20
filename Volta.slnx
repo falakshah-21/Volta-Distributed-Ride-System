@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="Volta.Client/Volta.Client.csproj" Id="8f270f91-4ed5-44a9-b593-4c17a5bc0cad" />
+  <Project Path="Volta.Contracts/Volta.Contracts.csproj" Id="8d271360-d720-4585-b422-a288b9e145b4" />
+  <Project Path="volta.gateway/Volta.Gateway.csproj" />
+  <Project Path="Volta.Services.Auth/Volta.Services.Auth.csproj" />
+  <Project Path="Volta.Services.Driver/Volta.Services.Driver.csproj" Id="8f1be0e0-0384-4910-8582-9a472711c2a6" />
+  <Project Path="Volta.Services.Ride/Volta.Services.Ride.csproj" />
+</Solution>

@@ -1,0 +1,6 @@
+@Volta.Services.Ride_HostAddress = http://localhost:5018
+
+GET {{Volta.Services.Ride_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

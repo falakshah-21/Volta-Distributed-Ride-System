@@ -1,0 +1,236 @@
+﻿@page "/admin"
+@inject HttpClient Http
+@inject NavigationManager Nav
+@using System.Net.Http.Json
+@using System.Net.Http.Headers
+@inject Blazored.SessionStorage.ISessionStorageService SessionStorage
+@inject IJSRuntime JSRuntime
+
+<div class="container mt-4" style="max-width: 1000px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold" style="color: #1e1e2f;">🛡️ Super Admin Panel</h3>
+            <small class="text-muted">Manage users, drivers, and system analytics</small>
+        </div>
+        <button class="btn btn-outline-secondary btn-sm" @onclick='() => Nav.NavigateTo("/")'>Back to Dashboard</button>
+    </div>
+
+    <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm">
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "pending" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "pending"'>🛑 Pending Drivers (@pendingDrivers.Count)</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "users" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "users"'>👥 All Users</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "history" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "history"'>📜 Global History</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link @(activeTab == "admins" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "admins"'>🔑 Manage Admins</button>
+        </li>
+    </ul>
+
+    <div class="card shadow border-0" style="min-height: 400px;">
+        <div class="card-body">
+
+            @if (activeTab == "pending")
+            {
+                <h5 class="fw-bold text-primary mb-3">👮 Verify New Drivers</h5>
+                @if (pendingDrivers.Count == 0)
+                {
+                    <div class="alert alert-success">✅ No pending requests. All caught up!</div>
+                }
+                else
+                {
+                    <table class="table align-middle">
+                        <thead><tr><th>Name</th><th>Car Info</th><th>Actions</th></tr></thead>
+                        <tbody>
+                            @foreach (var d in pendingDrivers)
+                            {
+                                <tr>
+                                    <td><span class="fw-bold">@d.FullName</span><br /><small class="text-muted">@d.Username</small></td>
+                                    <td>@d.CarName <span class="badge bg-light text-dark border">@d.CarNumber</span></td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm me-2" @onclick="() => ApproveDriver(d.Id)">✅ Approve</button>
+                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteUser(d.Id)">🗑️ Reject</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            }
+
+            @if (activeTab == "users")
+            {
+                <h5 class="fw-bold text-dark mb-3">👥 Manage Active Users</h5>
+                <p class="text-muted small">View and ban passengers or drivers.</p>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="bg-light"><tr><th>ID</th><th>Name</th><th>Role</th><th>Car (If Driver)</th><th>Action</th></tr></thead>
+                        <tbody>
+                            @foreach (var u in allUsers)
+                            {
+                                <tr>
+                                    <td>#@u.Id</td>
+                                    <td><span class="fw-bold">@u.FullName</span><br /><small class="text-muted">@u.Username</small></td>
+                                    <td>
+                                        <span class="badge @(u.Role == "Driver" ? "bg-info text-dark" : "bg-secondary")">@u.Role</span>
+                                    </td>
+                                    <td>@(u.Role == "Driver" ? $"{u.CarName} ({u.CarNumber})" : "--")</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.Id)">🚫 Ban User</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (activeTab == "history")
+            {
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark">📜 System-Wide Ride History</h5>
+                    <button class="btn btn-sm btn-outline-primary" @onclick="LoadHistory">🔄 Refresh</button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="bg-light"><tr><th>Ref</th><th>Passenger</th><th>Driver</th><th>Route</th><th>Price</th><th>Status</th></tr></thead>
+                        <tbody>
+                            @foreach (var r in globalHistory)
+                            {
+                                <tr>
+                                    <td>@r.Id</td>
+                                    <td>@r.PassengerName</td>
+                                    <td>@(r.DriverName ?? "--")</td>
+                                    <td><small>@r.PickupLocation ➝ @r.DropoffLocation</small></td>
+                                    <td class="fw-bold">@r.Price</td>
+                                    <td>
+                                        <span class="badge @(r.Status == "Completed" ? "bg-success" : r.Status == "Canceled" ? "bg-danger" : "bg-warning text-dark")">
+                                            @r.Status
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+
+            @if (activeTab == "admins")
+            {
+                <div class="row">
+                    <div class="col-md-7">
+                        <h5 class="fw-bold text-dark mb-3">🔑 Existing Admins</h5>
+                        <ul class="list-group">
+                            @foreach (var admin in adminList)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@admin.FullName <small class="text-muted">(@admin.Username)</small></span>
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteUser(admin.Id)">Remove</button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="p-3 bg-light rounded border">
+                            <h6 class="fw-bold">➕ Add New Admin</h6>
+                            <input @bind="newAdmin.FullName" class="form-control mb-2" placeholder="Full Name" />
+                            <input @bind="newAdmin.Username" class="form-control mb-2" placeholder="Username" />
+                            <input @bind="newAdmin.Password" type="password" class="form-control mb-2" placeholder="Password" />
+                            <button class="btn btn-dark w-100" @onclick="CreateAdmin">Create Admin</button>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private string activeTab = "pending";
+
+    // Lists
+    private List<UserDto> pendingDrivers = new();
+    private List<UserDto> allUsers = new();
+    private List<UserDto> adminList = new();
+    private List<RideHistoryDto> globalHistory = new();
+    private RegisterDto newAdmin = new RegisterDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var role = await SessionStorage.GetItemAsync<string>("userRole");
+        if (role != "Admin") { Nav.NavigateTo("/"); return; }
+
+        await LoadData();
+        await LoadHistory(); // New Step
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            // Existing endpoints
+            pendingDrivers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/pending-drivers");
+            adminList = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/list-admins");
+
+            // NEW: You need to add this endpoint to your Backend (AdminController)
+            allUsers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/users");
+        }
+        catch { }
+    }
+
+    private async Task LoadHistory()
+    {
+        try
+        {
+            var token = await SessionStorage.GetItemAsync<string>("authToken");
+            var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost:5002/ride/history");
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await Http.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+            {
+                globalHistory = await response.Content.ReadFromJsonAsync<List<RideHistoryDto>>();
+            }
+        }
+        catch { }
+    }
+
+    private async Task ApproveDriver(int id)
+    {
+        var res = await Http.PutAsync($"http://localhost:5001/api/admin/approve/{id}", null);
+        if (res.IsSuccessStatusCode) await LoadData();
+    }
+
+    private async Task DeleteUser(int id)
+    {
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "Permanently remove this user?")) return;
+        var res = await Http.DeleteAsync($"http://localhost:5001/api/admin/delete/{id}");
+        if (res.IsSuccessStatusCode) await LoadData();
+    }
+
+    private async Task CreateAdmin()
+    {
+        var res = await Http.PostAsJsonAsync("http://localhost:5001/api/admin/create-admin", newAdmin);
+        if (res.IsSuccessStatusCode)
+        {
+            newAdmin = new RegisterDto();
+            await LoadData();
+            await JSRuntime.InvokeVoidAsync("alert", "Admin Created!");
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Failed.");
+        }
+    }
+
+    // DTOs
+    public class UserDto { public int Id { get; set; } public string FullName { get; set; } public string Username { get; set; } public string Role { get; set; } public string CarName { get; set; } public string CarNumber { get; set; } }
+    public class RegisterDto { public string FullName { get; set; } public string Username { get; set; } public string Password { get; set; } }
+    public class RideHistoryDto { public int Id { get; set; } public string PassengerName { get; set; } public string DriverName { get; set; } public string PickupLocation { get; set; } public string DropoffLocation { get; set; } public decimal Price { get; set; } public string Status { get; set; } }
+}
