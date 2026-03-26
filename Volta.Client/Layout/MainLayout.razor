@@ -1,30 +1,44 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page-layout">
-
-    <div class="sidebar">
-        <div class="brand-box">
-            <h1 class="fw-bold m-0" style="font-size: 2.5rem;">⚡ VOLTA</h1>
-            <small class="text-white-50 mt-1">The Future of City Travel.</small>
-            <div class="divider"></div>
-        </div>
-
-        <NavMenu />
-    </div>
-
-    <div class="main-wrapper">
-
-        <div class="top-header">
-            <div class="text-center">
-                <h4 class="mb-0 fw-light">Secure. Fast. Electric.</h4>
-                <small class="text-white-50" style="letter-spacing: 1px;">
-                    Join the network that moves at your speed.
-                </small>
+<div class="volta-app-shell">
+    <aside class="volta-sidebar">
+        <div class="brand-section d-flex align-items-center gap-2">
+            <div class="brand-logo"
+                 style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                <svg style="width: 32px; height: 32px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <div class="brand-text">
+                <h1 class="m-0 fw-bold" font-size: 1.5rem; letter-spacing: 1px;">VOLTA
+                </h1>
+                <small>City Travel Redefined</small>
             </div>
         </div>
 
-        <div class="content-area">
-            @Body
+        <nav class="nav-container">
+            <NavMenu />
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="footer-divider"></div>
+            <small class="text-white-50">v1.0.4-beta</small>
         </div>
+    </aside>
+
+    <div class="main-stage">
+        <header class="top-navbar">
+            <div class="header-content">
+                <div class="slogan-group">
+                    <h4 class="m-0">Secure. Fast. Electric.</h4>
+                    <p class="m-0 text-white-50">Moving at your speed</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="content-body">
+            @Body
+        </main>
     </div>
 </div>

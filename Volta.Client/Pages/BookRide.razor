@@ -6,78 +6,127 @@
 @using System.Net.Http.Headers
 @inject IJSRuntime JSRuntime
 
-<div class="container-fluid p-0" style="height: calc(100vh - 60px);">
-    <div class="row h-100 g-0">
+<div class="volta-booking-wrapper">
+    <main class="map-container">
+        <div id="map"></div>
+    </main>
 
-        <div class="col-md-4 col-lg-3 bg-white shadow-lg p-4 d-flex flex-column z-index-10">
-            <h4 class="fw-bold mb-4" style="color: #1e1e2f;">🚗 Book a Ride</h4>
+    <aside class="booking-sidebar">
+        <div class="sidebar-header">
+            <button class="btn-back" @onclick='() => Nav.NavigateTo("/")'>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <h2 class="fw-bold m-0">Book a Ride</h2>
+        </div>
 
+        <div class="sidebar-content">
             @if (!string.IsNullOrEmpty(statusMessage))
             {
-                <div class="alert alert-info small text-center">@statusMessage</div>
+                <div class="status-alert slide-down">
+                    <span class="status-dot"></span> @statusMessage
+                </div>
             }
 
-            <div class="btn-group w-100 mb-3">
-                <button class="btn @(selectingPickup ? "btn-success" : "btn-outline-secondary")" @onclick="() => selectingPickup = true">📍 Pickup</button>
-                <button class="btn @(!selectingPickup ? "btn-danger" : "btn-outline-secondary")" @onclick="() => selectingPickup = false">🏁 Dropoff</button>
+            <div class="segmented-control mb-4">
+                <button class="segment-btn @(selectingPickup ? "active pickup" : "")"
+                        @onclick="() => selectingPickup = true">
+                    Pickup
+                </button>
+                <button class="segment-btn @(!selectingPickup ? "active dropoff" : "")"
+                        @onclick="() => selectingPickup = false">
+                    Dropoff
+                </button>
             </div>
 
-            <div class="mb-3">
-                <label class="fw-bold small text-muted">PICKUP LOCATION</label>
-                <div class="input-group">
-                    <input @bind="rideRequest.PickupLocation" class="form-control" placeholder="Search (e.g. Lucky One)..." />
-                    <button class="btn btn-outline-primary" @onclick="() => SearchMap(true)">🔍</button>
+            <div class="location-inputs mb-4">
+                <div class="input-wrapper mb-3">
+                    <div class="icon-indicator pickup-icon"></div>
+                    <div class="flex-grow-1">
+                        <label>Pickup Location</label>
+                        <div class="search-box">
+                            <input @bind="rideRequest.PickupLocation" placeholder="e.g. Lucky One Mall" />
+                            <button class="btn-search" @onclick="() => SearchMap(true)">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label class="fw-bold small text-muted">DROPOFF LOCATION</label>
-                <div class="input-group">
-                    <input @bind="rideRequest.DropoffLocation" class="form-control" placeholder="Search (e.g. KIET)..." />
-                    <button class="btn btn-outline-danger" @onclick="() => SearchMap(false)">🔍</button>
+                <div class="input-line-connector"></div>
+
+                <div class="input-wrapper">
+                    <div class="icon-indicator dropoff-icon"></div>
+                    <div class="flex-grow-1">
+                        <label>Dropoff Location</label>
+                        <div class="search-box">
+                            <input @bind="rideRequest.DropoffLocation" placeholder="e.g. KIET Main Campus" />
+                            <button class="btn-search" @onclick="() => SearchMap(false)">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             @if (!string.IsNullOrEmpty(etaText))
             {
-                <div class="alert alert-success d-flex justify-content-between align-items-center shadow-sm">
-                    <div>
-                        <small class="text-muted fw-bold d-block">ESTIMATED TIME</small>
-                        <span class="fs-4 fw-bold">⏱️ @etaText</span>
+                <div class="route-summary fade-in">
+                    <div class="summary-item">
+                        <svg class="text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div>
+                            <span class="d-block text-muted">Time</span>
+                            <span class="fw-bold text-dark">@etaText</span>
+                        </div>
                     </div>
-                    <div class="text-end">
-                        <small class="text-muted fw-bold d-block">DISTANCE</small>
-                        <span class="fs-5">📏 @distanceText</span>
+                    <div class="summary-divider"></div>
+                    <div class="summary-item">
+                        <svg class="text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                        <div>
+                            <span class="d-block text-muted">Distance</span>
+                            <span class="fw-bold text-dark">@distanceText</span>
+                        </div>
                     </div>
                 </div>
             }
 
-            <div class="mb-4">
-                <label class="fw-bold small text-muted">OFFER PRICE (PKR)</label>
-                <input @bind="rideRequest.Price" type="number" class="form-control fw-bold" placeholder="500" />
+            <div class="price-offer-section">
+                <label>Your Offer</label>
+                <div class="price-input-group">
+                    <span class="currency">PKR</span>
+                    <input @bind="rideRequest.Price" type="number" placeholder="0" class="price-input" />
+                </div>
             </div>
-
-            <button class="btn btn-primary w-100 py-2 mt-auto" style="background: linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%); border:none;" @onclick="BookNow">Request Ride</button>
-            <button class="btn btn-link text-muted w-100 mt-2" @onclick='() => Nav.NavigateTo("/")'>Cancel</button>
         </div>
 
-        <div class="col-md-8 col-lg-9 position-relative">
-            <div id="map" style="height: 100%; width: 100%; min-height: 500px; background-color: #eee;"></div>
+        <div class="sidebar-footer">
+            <button class="btn-book-now" @onclick="BookNow">Confirm Ride</button>
         </div>
-    </div>
+    </aside>
 </div>
 
 @code {
     private RideRequest rideRequest = new RideRequest();
-    private string statusMessage;
+    private string statusMessage = "";
     private bool selectingPickup = true;
 
-    // 🆕 Track Coordinates for Routing
     private double? pickLat, pickLng, dropLat, dropLng;
     private string etaText = "";
     private string distanceText = "";
 
-    // 1. INIT MAP
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -87,15 +136,13 @@
         }
     }
 
-    // 2. SEARCH BUTTON CLICKED
     private async Task SearchMap(bool isPickup)
     {
         string query = isPickup ? rideRequest.PickupLocation : rideRequest.DropoffLocation;
         if (string.IsNullOrEmpty(query)) return;
 
-        statusMessage = "🔍 Searching...";
+        statusMessage = "Searching...";
 
-        // We now get the "lat,lng" string back from JS
         string coords = await JSRuntime.InvokeAsync<string>("voltaMap.searchLocation", query, isPickup);
 
         if (!string.IsNullOrEmpty(coords))
@@ -104,13 +151,11 @@
             if (isPickup) { pickLat = double.Parse(parts[0]); pickLng = double.Parse(parts[1]); }
             else { dropLat = double.Parse(parts[0]); dropLng = double.Parse(parts[1]); }
 
-            // Trigger Route Calculation
             await CheckRoute();
         }
         statusMessage = "";
     }
 
-    // 3. MAP CLICKED
     [JSInvokable]
     public async Task OnMapClicked(double lat, double lng, string address)
     {
@@ -119,34 +164,30 @@
             rideRequest.PickupLocation = address;
             pickLat = lat; pickLng = lng;
             await JSRuntime.InvokeVoidAsync("voltaMap.addMarker", lat, lng, true);
-            selectingPickup = false; // Auto-switch
+            selectingPickup = false;
         }
         else
         {
             rideRequest.DropoffLocation = address;
             dropLat = lat; dropLng = lng;
             await JSRuntime.InvokeVoidAsync("voltaMap.addMarker", lat, lng, false);
-
-            // Trigger Route Calculation
             await CheckRoute();
         }
-
         StateHasChanged();
     }
 
-    // 🆕 4. CALCULATE ROUTE (Blue Line + ETA)
     private async Task CheckRoute()
     {
         if (pickLat.HasValue && dropLat.HasValue)
         {
-            statusMessage = "🔄 Calculating path...";
+            statusMessage = "Calculating path...";
             string result = await JSRuntime.InvokeAsync<string>("voltaMap.calculateRoute", pickLat, pickLng, dropLat, dropLng);
 
             if (!string.IsNullOrEmpty(result))
             {
                 var parts = result.Split('|');
-                etaText = parts[0];      // e.g. "15 mins"
-                distanceText = parts[1]; // e.g. "5.2 km"
+                etaText = parts[0];
+                distanceText = parts[1];
             }
             statusMessage = "";
             StateHasChanged();
@@ -155,14 +196,14 @@
 
     private async Task BookNow()
     {
-        if (rideRequest.Price <= 0) { statusMessage = "❌ Price must be valid!"; return; }
-        if (string.IsNullOrEmpty(rideRequest.PickupLocation)) { statusMessage = "❌ Enter Pickup!"; return; }
+        if (rideRequest.Price <= 0) { statusMessage = "Please enter a valid offer amount."; return; }
+        if (string.IsNullOrEmpty(rideRequest.PickupLocation)) { statusMessage = "Please select a pickup location."; return; }
 
-        statusMessage = "Submitting...";
+        statusMessage = "Connecting you to drivers...";
         try
         {
             var token = await SessionStorage.GetItemAsync<string>("authToken");
-            if (string.IsNullOrEmpty(token)) { statusMessage = "❌ Not logged in!"; return; }
+            if (string.IsNullOrEmpty(token)) { statusMessage = "Authentication required. Please log in."; return; }
 
             var msg = new HttpRequestMessage(HttpMethod.Post, "http://localhost:5002/ride/book");
             msg.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -171,14 +212,18 @@
             var res = await Http.SendAsync(msg);
             if (res.IsSuccessStatusCode)
             {
-                statusMessage = "✅ Request Sent!";
-                await Task.Delay(1000);
+                statusMessage = "Ride requested successfully!";
+                await Task.Delay(1500);
                 Nav.NavigateTo("/");
             }
-            else { statusMessage = "❌ Error: " + res.StatusCode; }
+            else { statusMessage = "Error: " + res.StatusCode; }
         }
-        catch (Exception ex) { statusMessage = "Error: " + ex.Message; }
+        catch (Exception ex) { statusMessage = "Connection failed. Please try again."; }
     }
 
-    public class RideRequest { public string PickupLocation { get; set; } public string DropoffLocation { get; set; } public decimal Price { get; set; } }
+    public class RideRequest
+    {
+        public string PickupLocation { get; set; } = ""; public string DropoffLocation { get; set; }
+= ""; public decimal Price { get; set; }
+    }
 }

@@ -1,127 +1,177 @@
 ﻿@page "/"
+@implements IDisposable
 @inject NavigationManager Nav
 @inject Blazored.SessionStorage.ISessionStorageService SessionStorage
 @inject HttpClient Http
 @using System.Net.Http.Headers
 @using System.Net.Http.Json
 
-<div class="container mt-5" style="max-width: 900px;">
+<div class="volta-dashboard-wrapper">
+    <div class="dashboard-container">
+        
+        <header class="dashboard-header">
+            <div class="logo-section d-flex align-items-center gap-3">
+                <div class="logo-icon" style="width: 48px; height: 48px; background: #0f172a; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                    <svg style="width: 24px; height: 24px; color: #38bdf8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <div>
+                   <h1 class="brand-title" style="color: #0f172a !important; font-size: 2rem; font-weight: 800; margin: 0;">Volta</h1>
+                   <span class="role-badge @(userRole.ToLower())">@userRole</span>
+                </div>
+            </div>
+            <button class="btn-logout" @onclick="Logout">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                Sign Out
+            </button>
+        </header>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold" style="color: #1e1e2f;">⚡ Volta Dashboard</h2>
-            <span class="badge bg-secondary">@userRole</span>
-        </div>
-        <button class="btn btn-sm btn-outline-dark" @onclick="Logout">Sign Out</button>
-    </div>
-
-    @if (isLoading)
-    {
-        <div class="text-center py-5"><div class="spinner-border text-primary"></div></div>
-    }
-    else
-    {
-        // --- LOGIC: IF I HAVE AN ACTIVE RIDE, SHOW IT. IGNORE EVERYTHING ELSE. ---
-        @if (currentActiveRide != null)
-        {
-            <div class="card shadow-lg border-0 mb-4" style="border-left: 6px solid #28a745;">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h4 class="text-success fw-bold">
-                                @(userRole == "Driver" ? "🚖 Current Job" : "🚗 Ride Status")
-                            </h4>
-                            <div class="text-muted small mb-2">Ref: #@currentActiveRide.Id</div>
-                        </div>
-                        <h2 class="fw-bold text-dark">Rs. @currentActiveRide.Price</h2>
-                    </div>
-
-                    <div class="row mt-3">
-                        <div class="col-md-7">
-                            <h5 class="mb-1">📍 @currentActiveRide.PickupLocation</h5>
-                            <h5 class="mb-1">🏁 @currentActiveRide.DropoffLocation</h5>
-                            <div class="mt-3">
+        <main class="dashboard-main fade-in-up">
+            @if (isLoading)
+            {
+                <div class="loading-state">
+                    <div class="pulse-ring"></div>
+                    <p>Syncing network...</p>
+                </div>
+            }
+            else
+            {
+                @if (currentActiveRide != null)
+                {
+                    <div class="active-ride-card">
+                        <div class="card-glow-border"></div>
+                        <div class="ride-header">
+                            <div class="status-indicator">
                                 @if (currentActiveRide.Status == "Requested")
                                 {
-                                    <span class="badge bg-warning text-dark px-3 py-2">🔍 Finding Driver...</span>
+                                    <span class="live-dot warning"></span>
+                                    <span class="fw-bold text-dark">Finding your driver...</span>
                                 }
                                 else if (currentActiveRide.Status == "Accepted")
                                 {
-                                    <span class="badge bg-success px-3 py-2">✅ On the way!</span>
-                                    @if (!string.IsNullOrEmpty(currentActiveRide.DriverName))
-                                    {
-                                        <div class="mt-2 small text-muted">Driver: <strong>@currentActiveRide.DriverName</strong></div>
-                                    }
+                                    <span class="live-dot success"></span>
+                                    <span class="fw-bold text-dark">Ride in Progress</span>
                                 }
+                            </div>
+                            <div class="ride-price">
+                                <span class="currency">Rs.</span>
+                                <span class="amount">@currentActiveRide.Price</span>
                             </div>
                         </div>
 
-                        <div class="col-md-5 text-end d-flex flex-column gap-2">
+                        <div class="ride-body">
+                            <div class="route-timeline">
+                                <div class="timeline-point pickup"></div>
+                                <div class="timeline-line"></div>
+                                <div class="timeline-point dropoff"></div>
+                                <div class="route-locations">
+                                    <div class="location">
+                                        <small>PICKUP</small>
+                                        <span class="fw-bold">@currentActiveRide.PickupLocation</span>
+                                    </div>
+                                    <div class="location">
+                                        <small>DROPOFF</small>
+                                        <span class="fw-bold">@currentActiveRide.DropoffLocation</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (currentActiveRide.Status == "Accepted" && !string.IsNullOrEmpty(currentActiveRide.DriverName))
+                            {
+                                <div class="driver-info-box">
+                                    <div class="driver-avatar">@currentActiveRide.DriverName.FirstOrDefault()</div>
+                                    <div>
+                                        <small class="text-muted d-block">YOUR DRIVER</small>
+                                        <span class="fw-bold">@currentActiveRide.DriverName</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="ride-actions">
                             @if (userRole == "Driver" && currentActiveRide.Status == "Accepted")
                             {
-                                <button class="btn btn-success fw-bold py-2" @onclick="CompleteRide">✅ Finish Ride</button>
+                                <button class="btn-action-primary" @onclick="CompleteRide">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Complete Trip
+                                </button>
                             }
-
-                            <button class="btn btn-outline-danger" @onclick="CancelRide">❌ Cancel Ride</button>
+                            <button class="btn-action-danger" @onclick="CancelRide">Cancel Ride</button>
                         </div>
                     </div>
-                </div>
-            </div>
-        }
-        // --- LOGIC: IF NO ACTIVE RIDE, SHOW "AVAILABLE RIDES" (Driver) OR "BOOK NEW" (Passenger) ---
-        else
-        {
-            @if (userRole == "Driver")
-            {
-                <div class="card shadow-sm">
-                    <div class="card-header bg-dark text-white d-flex justify-content-between">
-                        <h5 class="mb-0">📡 Available Requests</h5>
-                        <button class="btn btn-sm btn-outline-light" @onclick="LoadAvailableRides">🔄 Refresh</button>
-                    </div>
-                    <div class="card-body p-0">
+                }
+                else if (userRole == "Driver")
+                {
+                    <div class="driver-feed">
+                        <div class="feed-header">
+                            <div class="radar-indicator">
+                                <span class="radar-dot"></span>
+                                <h3 class="m-0 fw-bold">Live Requests</h3>
+                            </div>
+                            <button class="btn-icon" @onclick="LoadAvailableRides" title="Refresh Feed">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            </button>
+                        </div>
+
                         @if (availableRides.Count == 0)
                         {
-                            <div class="p-5 text-center text-muted">
-                                <h5>💤 No passengers nearby.</h5>
-                                <p>We will auto-refresh every few seconds.</p>
+                            <div class="empty-radar">
+                                <div class="radar-circle">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                </div>
+                                <h4>Scanning area...</h4>
+                                <p>No passengers nearby. We'll alert you when a request pops up.</p>
                             </div>
                         }
                         else
                         {
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="bg-light"><tr><th class="ps-4">Route</th><th>Price</th><th>Action</th></tr></thead>
-                                <tbody>
-                                    @foreach (var ride in availableRides)
-                                    {
-                                        <tr>
-                                            <td class="ps-4">
-                                                <div class="fw-bold">@ride.PickupLocation</div>
-                                                <div class="small text-muted">to @ride.DropoffLocation</div>
-                                            </td>
-                                            <td class="fw-bold text-success">Rs. @ride.Price</td>
-                                            <td>
-                                                <button class="btn btn-primary btn-sm px-3" @onclick="() => AcceptRide(ride.Id)">✋ Accept</button>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
+                            <div class="job-cards-grid">
+                                @foreach (var ride in availableRides)
+                                {
+                                    <div class="job-card">
+                                        <div class="job-price">Rs. @ride.Price</div>
+                                        <div class="job-route">
+                                            <div class="job-location">
+                                                <span class="dot pickup"></span> @ride.PickupLocation
+                                            </div>
+                                            <div class="job-location">
+                                                <span class="dot dropoff"></span> @ride.DropoffLocation
+                                            </div>
+                                        </div>
+                                        <button class="btn-accept" @onclick="() => AcceptRide(ride.Id)">Accept Job</button>
+                                    </div>
+                                }
+                            </div>
                         }
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="passenger-home">
+                        <div class="booking-prompt-card shadow-lg">
+                            <h2>Where to?</h2>
+                            <div class="mock-input" @onclick='() => Nav.NavigateTo("/book")'>
+                                <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                <span>Search destination...</span>
+                            </div>
+                            
+                            <div class="quick-actions">
+                                <button class="action-btn" @onclick='() => Nav.NavigateTo("/history")'>
+                                    <div class="action-icon bg-blue"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>
+                                    <span>History</span>
+                                </button>
+                                <button class="action-btn" @onclick='() => Nav.NavigateTo("/book")'>
+                                    <div class="action-icon bg-dark"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg></div>
+                                    <span>Map</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
-            else // PASSENGER
-            {
-                <div class="text-center py-5 bg-white shadow-sm rounded">
-                    <h3 class="fw-bold text-muted">Ready to go?</h3>
-                    <p class="text-muted mb-4">Book a ride instantly with our secure network.</p>
-                    <button class="btn btn-primary btn-lg px-5 shadow" @onclick='() => Nav.NavigateTo("/book")'>
-                        🚗 Book a New Ride
-                    </button>
-                </div>
-            }
-        }
-    }
+        </main>
+    </div>
 </div>
 
 @code {
@@ -142,12 +192,10 @@
         await RefreshDashboard();
         isLoading = false;
 
-        // Auto-Refresh every 3 seconds
         _timer = new System.Threading.Timer(async _ =>
         {
             await InvokeAsync(async () =>
             {
-                // Only refresh if we are on this page
                 if (Nav.Uri == Nav.BaseUri)
                 {
                     await RefreshDashboard();
@@ -163,8 +211,6 @@
     {
         try
         {
-            // 1. Check Active Ride
-            // IMPORTANT: Sending request to GATEWAY (5000) or RIDE (5002). Using 5002 for direct test.
             var activeRes = await Http.GetAsync("http://localhost:5002/ride/my-active");
             if (activeRes.IsSuccessStatusCode && activeRes.StatusCode != System.Net.HttpStatusCode.NoContent)
             {
@@ -175,14 +221,12 @@
                 currentActiveRide = null;
             }
 
-            // 2. Logic: If I am a Driver AND I have NO active ride, fetch pending
             if (userRole == "Driver" && currentActiveRide == null)
             {
-                availableRides = await Http.GetFromJsonAsync<List<RideDto>>("http://localhost:5002/ride/pending");
+                availableRides = await Http.GetFromJsonAsync<List<RideDto>>("http://localhost:5002/ride/pending") ?? new();
             }
             else
             {
-                // Clear the list so I don't see ghosts
                 availableRides.Clear();
             }
         }
@@ -213,5 +257,5 @@
 
     private async Task Logout() { _timer?.Dispose(); await SessionStorage.ClearAsync(); Nav.NavigateTo("/login"); }
 
-    public class RideDto { public int Id { get; set; } public string PickupLocation { get; set; } public string DropoffLocation { get; set; } public decimal Price { get; set; } public string Status { get; set; } public string DriverName { get; set; } }
+    public class RideDto { public int Id { get; set; } public string PickupLocation { get; set; } = ""; public string DropoffLocation { get; set; } = ""; public decimal Price { get; set; } public string Status { get; set; } = ""; public string DriverName { get; set; } = ""; }
 }

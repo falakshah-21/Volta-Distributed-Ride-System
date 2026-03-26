@@ -4,86 +4,192 @@
 @inject NavigationManager Nav
 @using System.Net.Http.Json
 
-<div class="card shadow-lg border-0 p-4" style="width: 100%; max-width: 450px; border-radius: 16px;">
-    <div class="text-center mb-3">
-        <h2 class="fw-bold" style="color: #3f51b5;">Create Account</h2>
-        <p class="text-muted">Join the Volta network today</p>
-    </div>
+<div class="volta-auth-wrapper fade-in-up" style="max-width: 500px;">
+    <div class="auth-card shadow-xl">
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger text-center small">@errorMessage</div>
-    }
+        <div class="auth-header text-center mb-4">
+            <h2 class="fw-bold text-dark m-0">Create Account</h2>
+            <p class="text-muted small mt-1">Join the Volta network today</p>
+        </div>
 
-    <div class="mb-3">
-        <label class="fw-bold small text-muted">FULL NAME</label>
-        <input @bind="registerModel.FullName" class="form-control" placeholder="Enter Full Name" />
-    </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="auth-alert slide-down">
+                <svg class="w-5 h-5 alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                <span>@errorMessage</span>
+            </div>
+        }
 
-    <div class="mb-3">
-        <label class="fw-bold small text-muted">USERNAME</label>
-        <input @bind="registerModel.Username" class="form-control" placeholder="Enter Username" />
-    </div>
+        <div class="auth-form">
 
-    <div class="row g-2 mb-3">
-        <div class="col">
-            <label class="fw-bold small text-muted">PASSWORD</label>
-            <div class="input-group">
-                <input @bind="registerModel.Password" type="@(showPassword ? "text" : "password")" class="form-control" placeholder="••••••" />
-                <button class="btn btn-outline-secondary" type="button" @onclick="() => showPassword = !showPassword">
-                    @(showPassword ? "🙈" : "👁️")
+            <label>I want to join as a:</label>
+            <div class="role-selector mb-4">
+                <button class="role-btn @(registerModel.Role == "Passenger" ? "active" : "")"
+                        @onclick='() => SetRole("Passenger")'>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>Passenger</span>
+                </button>
+                <button class="role-btn @(registerModel.Role == "Driver" ? "active" : "")"
+                        @onclick='() => SetRole("Driver")'>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                    </svg>
+                    <span>Driver</span>
                 </button>
             </div>
-        </div>
-        <div class="col">
-            <label class="fw-bold small text-muted">CONFIRM</label>
-            <input @bind="confirmPassword" type="password" class="form-control" placeholder="••••••" />
-        </div>
-    </div>
 
-    <div class="mb-3">
-        <label class="small text-muted fw-bold">I AM A:</label>
-        <select @bind="registerModel.Role" class="form-select">
-            <option value="" disabled selected>Select Role</option>
-            <option value="Passenger">Passenger</option>
-            <option value="Driver">Driver</option>
-        </select>
-    </div>
-
-    @if (registerModel.Role == "Driver")
-    {
-        <div class="p-3 bg-light rounded border mb-3">
-            <small class="text-primary fw-bold mb-2 d-block">🚘 Vehicle Details</small>
-            <input @bind="registerModel.CarName" class="form-control form-control-sm mb-2" placeholder="Car Name (e.g. Honda Civic)" />
-            <div class="row g-1">
-                <div class="col">
-                    <input @bind="registerModel.CarModel" class="form-control form-control-sm" placeholder="Year" />
-                </div>
-                <div class="col">
-                    <input @bind="registerModel.CarNumber" class="form-control form-control-sm" placeholder="Plate (ABC-123)" />
+            <div class="input-group mb-3">
+                <label>Full Name</label>
+                <div class="input-with-icon">
+                    <div class="icon-wrapper">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z">
+                            </path>
+                        </svg>
+                    </div>
+                    <input @bind="registerModel.FullName" class="custom-input" placeholder="e.g. Jane Doe" />
                 </div>
             </div>
+
+            <div class="input-group mb-3">
+                <label>Username</label>
+                <div class="input-with-icon">
+                    <div class="icon-wrapper">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <input @bind="registerModel.Username" class="custom-input" placeholder="Choose a unique username" />
+                </div>
+            </div>
+
+            <div class="input-grid mb-3">
+                <div class="input-group">
+                    <label>Password</label>
+                    <div class="input-with-icon">
+                        <div class="icon-wrapper">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                </path>
+                            </svg>
+                        </div>
+                        <input @bind="registerModel.Password" type="@(showPassword ? "text" : "password")"
+                               class="custom-input" placeholder="••••••••" />
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Confirm</label>
+                    <div class="input-with-icon">
+                        <div class="icon-wrapper">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <input @bind="confirmPassword" @onkeydown="HandleKeyDown"
+                               type="@(showPassword ? "text" : "password")" class="custom-input" placeholder="••••••••" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="driver-details-drawer @(registerModel.Role == "Driver" ? "open" : "")">
+                <div class="drawer-content">
+                    <div class="divider-with-text mb-3"><span>Vehicle Details</span></div>
+
+                    <div class="input-group mb-2">
+                        <input @bind="registerModel.CarName" class="custom-input"
+                               placeholder="Car Name (e.g. Toyota Corolla)" />
+                    </div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <input @bind="registerModel.CarModel" class="custom-input" placeholder="Year (e.g. 2022)" />
+                        </div>
+                        <div class="input-group">
+                            <input @bind="registerModel.CarNumber" class="custom-input" placeholder="Plate (ABC-123)" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary-full mt-4 mb-4 @(isLoading ? "loading" : "")" @onclick="HandleRegister"
+                    disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner"></span>
+                    <span>Creating Account...</span>
+                }
+                else
+                {
+                    <span>Register</span>
+                }
+            </button>
         </div>
-    }
 
-    <button class="btn btn-primary w-100 mb-3" @onclick="HandleRegister">Register</button>
+        <div class="auth-footer text-center">
+            <p class="text-muted small m-0">
+                Already have an account? <a href="/login" class="fw-bold link-primary">Sign in</a>
+            </p>
+        </div>
 
-    <div class="text-center">
-        <small class="text-muted">Already have an account? <a href="/login" class="fw-bold" style="color: #3f51b5;">Login</a></small>
     </div>
 </div>
 
 @code {
-    private RegisterRequest registerModel = new RegisterRequest { Role = "" };
+    private RegisterRequest registerModel = new RegisterRequest { Role = "Passenger" }; // Default role
     private string confirmPassword = "";
-    private string errorMessage;
+    private string errorMessage = "";
     private bool showPassword = false;
+    private bool isLoading = false;
+
+    private void SetRole(string role)
+    {
+        registerModel.Role = role;
+        errorMessage = ""; // Clear errors when switching roles
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !isLoading)
+        {
+            await HandleRegister();
+        }
+    }
 
     private async Task HandleRegister()
     {
-        // Validation
-        if (registerModel.Password != confirmPassword) { errorMessage = "Passwords do not match!"; return; }
-        if (string.IsNullOrWhiteSpace(registerModel.Role)) { errorMessage = "Please select a Role."; return; }
+        // Front-end Validation
+        if (string.IsNullOrWhiteSpace(registerModel.FullName) || string.IsNullOrWhiteSpace(registerModel.Username))
+        {
+            errorMessage = "Please fill in all required fields.";
+            return;
+        }
+        if (registerModel.Password != confirmPassword)
+        {
+            errorMessage = "Passwords do not match.";
+            return;
+        }
+        if (registerModel.Role == "Driver" && (string.IsNullOrWhiteSpace(registerModel.CarName) ||
+string.IsNullOrWhiteSpace(registerModel.CarNumber)))
+        {
+            errorMessage = "Vehicle details are required for drivers.";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = "";
+        StateHasChanged();
 
         try
         {
@@ -95,17 +201,26 @@
             else
             {
                 errorMessage = await response.Content.ReadAsStringAsync();
+                if (string.IsNullOrWhiteSpace(errorMessage)) errorMessage = "Registration failed. Please try again.";
             }
         }
-        catch (Exception ex) { errorMessage = "Connection Failed: " + ex.Message; }
+        catch (Exception)
+        {
+            errorMessage = "Connection Failed. Please check your network.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
     public class RegisterRequest
     {
-        public string FullName { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public string Role { get; set; }
+        public string FullName { get; set; } = "";
+        public string Username { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string Role { get; set; } = "";
         public string? CarName { get; set; }
         public string? CarModel { get; set; }
         public string? CarNumber { get; set; }

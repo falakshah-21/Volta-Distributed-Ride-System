@@ -5,74 +5,173 @@
 @using System.Net.Http.Json
 @inject Blazored.SessionStorage.ISessionStorageService SessionStorage
 
-<div class="card shadow-lg border-0 p-5" style="width: 100%; max-width: 400px; border-radius: 16px;">
-    <div class="text-center mb-4">
-        <h2 class="fw-bold" style="color: #3f51b5;">Welcome Back</h2>
-        <p class="text-muted">Login to access your dashboard</p>
-    </div>
+<div class="volta-auth-wrapper fade-in-up">
+    <div class="auth-card shadow-xl">
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <div class="alert alert-danger text-center small">@errorMessage</div>
-    }
+        <div class="auth-header text-center mb-4">
+            <div class="auth-logo mx-auto mb-3">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </div>
+            <h2 class="fw-bold text-dark m-0">Welcome Back</h2>
+            <p class="text-muted small mt-1">Sign in to continue to Volta</p>
+        </div>
 
-    <div class="mb-3">
-        <label class="fw-bold small text-muted">USERNAME</label>
-        <input @bind="loginModel.Username" class="form-control form-control-lg" placeholder="Enter Username" />
-    </div>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="auth-alert slide-down">
+                <svg class="w-5 h-5 alert-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+                <span>@errorMessage</span>
+            </div>
+        }
 
-    <div class="mb-4">
-        <label class="fw-bold small text-muted">PASSWORD</label>
-        <div class="input-group">
-            <input @bind="loginModel.Password" type="@(showPassword ? "text" : "password")" class="form-control form-control-lg" placeholder="••••••" />
-            <button class="btn btn-outline-secondary" type="button" @onclick="() => showPassword = !showPassword">
-                @(showPassword ? "🙈" : "👁️")
+        <div class="auth-form">
+            <div class="input-group mb-3">
+                <label>Username</label>
+                <div class="input-with-icon">
+                    <div class="icon-wrapper">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                    </div>
+                    <input @bind="loginModel.Username" @bind:event="oninput" @onkeydown="HandleKeyDown"
+                           class="custom-input" placeholder="Enter your username" autocomplete="username" />
+                </div>
+            </div>
+
+            <div class="input-group mb-4">
+                <div class="d-flex justify-content-between">
+                    <label>Password</label>
+                    <a href="#" class="forgot-link" @onclick:preventDefault>Forgot?</a>
+                </div>
+                <div class="input-with-icon">
+                    <div class="icon-wrapper">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <input @bind="loginModel.Password" @bind:event="oninput" @onkeydown="HandleKeyDown"
+                           type="@(showPassword ? "text" : "password")" class="custom-input" placeholder="••••••••"
+                           autocomplete="current-password" />
+                    <button class="btn-toggle-password" type="button" @onclick="() => showPassword = !showPassword"
+                            tabindex="-1">
+                        @if (showPassword)
+                        {
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21">
+                                </path>
+                            </svg>
+                        }
+                        else
+                        {
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                </path>
+                            </svg>
+                        }
+                    </button>
+                </div>
+            </div>
+
+            <button class="btn-primary-full mb-4 @(isLoading ? "loading" : "")" @onclick="HandleLogin"
+                    disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner"></span>
+                    <span>Authenticating...</span>
+                }
+                else
+                {
+                    <span>Sign In</span>
+                }
             </button>
         </div>
-    </div>
 
-    <button class="btn btn-primary btn-lg w-100 mb-3" @onclick="HandleLogin">Login</button>
+        <div class="auth-footer text-center">
+            <p class="text-muted small m-0">
+                Don't have an account? <a href="/register" class="fw-bold link-primary">Create one</a>
+            </p>
+        </div>
 
-    <div class="text-center">
-        <small class="text-muted">Don't have an account? <a href="/register" class="fw-bold" style="color: #3f51b5;">Sign Up</a></small>
     </div>
 </div>
 
 @code {
     private LoginRequest loginModel = new LoginRequest();
-    private string errorMessage;
+    private string errorMessage = "";
     private bool showPassword = false;
+    private bool isLoading = false;
+
+    // UX Upgrade: Allow pressing 'Enter' to submit the form
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !isLoading)
+        {
+            await HandleLogin();
+        }
+    }
 
     private async Task HandleLogin()
     {
+        // Simple validation before hitting API
+        if (string.IsNullOrWhiteSpace(loginModel.Username) || string.IsNullOrWhiteSpace(loginModel.Password))
+        {
+            errorMessage = "Please enter both username and password.";
+            return;
+        }
+
+        isLoading = true;
+        errorMessage = "";
+        StateHasChanged(); // Force UI update to show loader
+
         try
         {
             var response = await Http.PostAsJsonAsync("http://localhost:5001/api/auth/login", loginModel);
             if (response.IsSuccessStatusCode)
             {
                 var result = await response.Content.ReadFromJsonAsync<LoginResponse>();
-                await SessionStorage.SetItemAsync("authToken", result.Token);
-                await SessionStorage.SetItemAsync("userRole", result.Role);
-
-                // Force Refresh to ensure the MainLayout loads correctly
-                Nav.NavigateTo("/", forceLoad: true);
+                if (result != null)
+                {
+                    await SessionStorage.SetItemAsync("authToken", result.Token);
+                    await SessionStorage.SetItemAsync("userRole", result.Role);
+                    Nav.NavigateTo("/", forceLoad: true);
+                }
             }
             else
             {
-                // Read the error message from the API if possible, otherwise generic message
                 var errorContent = await response.Content.ReadAsStringAsync();
                 errorMessage = !string.IsNullOrEmpty(errorContent) ? errorContent : "Invalid Username or Password";
 
-                // Handle the specific "Account Pending" 401 case
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized && errorContent.Contains("Pending"))
                 {
-                    errorMessage = "⛔ Account Pending! An Admin must approve you first.";
+                    errorMessage = "Account Pending. An Admin must approve you first.";
                 }
             }
         }
-        catch (Exception ex) { errorMessage = "Server Error: " + ex.Message; }
+        catch (Exception)
+        {
+            errorMessage = "Connection failed. Please check your network.";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
     }
 
-    public class LoginRequest { public string Username { get; set; } public string Password { get; set; } }
-    public class LoginResponse { public string Token { get; set; } public string Role { get; set; } }
+    public class LoginRequest { public string Username { get; set; } = ""; public string Password { get; set; } = ""; }
+    public class LoginResponse { public string Token { get; set; } = ""; public string Role { get; set; } = ""; }
 }

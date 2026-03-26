@@ -1,86 +1,84 @@
 ﻿@page "/admin"
 @inject HttpClient Http
 @inject NavigationManager Nav
-@using System.Net.Http.Json
-@using System.Net.Http.Headers
 @inject Blazored.SessionStorage.ISessionStorageService SessionStorage
 @inject IJSRuntime JSRuntime
+@using System.Net.Http.Json
+@using System.Net.Http.Headers
 
-<div class="container mt-4" style="max-width: 1000px;">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold" style="color: #1e1e2f;">🛡️ Super Admin Panel</h3>
-            <small class="text-muted">Manage users, drivers, and system analytics</small>
+<div class="admin-dashboard">
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="title-group">
+                <div class="icon-box">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="page-title">Super Admin Panel</h1>
+                    <p class="page-subtitle">Manage users, drivers, and system analytics</p>
+                </div>
+            </div>
+            <button class="btn-glass" @onclick='() => Nav.NavigateTo("/")'>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Back to Dashboard
+            </button>
         </div>
-        <button class="btn btn-outline-secondary btn-sm" @onclick='() => Nav.NavigateTo("/")'>Back to Dashboard</button>
-    </div>
+    </header>
 
-    <ul class="nav nav-pills mb-4 bg-white p-2 rounded shadow-sm">
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "pending" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "pending"'>🛑 Pending Drivers (@pendingDrivers.Count)</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "users" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "users"'>👥 All Users</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "history" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "history"'>📜 Global History</button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link @(activeTab == "admins" ? "active bg-primary" : "text-dark")" @onclick='() => activeTab = "admins"'>🔑 Manage Admins</button>
-        </li>
-    </ul>
+   <nav class="custom-tabs">
+        <button class="tab-btn @(activeTab == "pending" ? "active-tab" : "")" @onclick='() => SwitchTab("pending")'>
+            Pending Drivers 
+            @if (pendingDrivers.Count > 0) { <span class="badge-pulse">@pendingDrivers.Count</span> }
+        </button>
+        <button class="tab-btn @(activeTab == "users" ? "active-tab" : "")" @onclick='() => SwitchTab("users")'>All Users</button>
+        <button class="tab-btn @(activeTab == "history" ? "active-tab" : "")" @onclick='() => SwitchTab("history")'>Global History</button>
+        <button class="tab-btn @(activeTab == "admins" ? "active-tab" : "")" @onclick='() => SwitchTab("admins")'>Manage Admins</button>
+    </nav>
 
-    <div class="card shadow border-0" style="min-height: 400px;">
-        <div class="card-body">
+    <main class="dashboard-card shadow-sm fade-in-up" key="@activeTab">
+        
+        @if (activeTab == "pending")
+        {
+            <div class="section-header">
+                <h2>Verify New Drivers</h2>
+                <p>Review and approve driver applications.</p>
+            </div>
 
-            @if (activeTab == "pending")
+            @if (pendingDrivers.Count == 0)
             {
-                <h5 class="fw-bold text-primary mb-3">👮 Verify New Drivers</h5>
-                @if (pendingDrivers.Count == 0)
-                {
-                    <div class="alert alert-success">✅ No pending requests. All caught up!</div>
-                }
-                else
-                {
-                    <table class="table align-middle">
-                        <thead><tr><th>Name</th><th>Car Info</th><th>Actions</th></tr></thead>
+                <div class="empty-state">
+                    <div class="empty-icon">🎉</div>
+                    <h3>All caught up!</h3>
+                    <p>There are no pending driver requests at the moment.</p>
+                </div>
+            }
+            else
+            {
+                <div class="table-container">
+                    <table class="modern-table">
+                        <thead><tr><th>Applicant</th><th>Vehicle Details</th><th class="text-right">Actions</th></tr></thead>
                         <tbody>
                             @foreach (var d in pendingDrivers)
                             {
                                 <tr>
-                                    <td><span class="fw-bold">@d.FullName</span><br /><small class="text-muted">@d.Username</small></td>
-                                    <td>@d.CarName <span class="badge bg-light text-dark border">@d.CarNumber</span></td>
                                     <td>
-                                        <button class="btn btn-success btn-sm me-2" @onclick="() => ApproveDriver(d.Id)">✅ Approve</button>
-                                        <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteUser(d.Id)">🗑️ Reject</button>
+                                        <div class="user-cell">
+                                            <div class="avatar bg-indigo">@d.FullName.FirstOrDefault()</div>
+                                            <div class="user-info">
+                                                <span class="fw-bold">@d.FullName</span>
+                                                <span class="text-muted">@d.Username</span>
+                                            </div>
+                                        </div>
                                     </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            }
-
-            @if (activeTab == "users")
-            {
-                <h5 class="fw-bold text-dark mb-3">👥 Manage Active Users</h5>
-                <p class="text-muted small">View and ban passengers or drivers.</p>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="bg-light"><tr><th>ID</th><th>Name</th><th>Role</th><th>Car (If Driver)</th><th>Action</th></tr></thead>
-                        <tbody>
-                            @foreach (var u in allUsers)
-                            {
-                                <tr>
-                                    <td>#@u.Id</td>
-                                    <td><span class="fw-bold">@u.FullName</span><br /><small class="text-muted">@u.Username</small></td>
                                     <td>
-                                        <span class="badge @(u.Role == "Driver" ? "bg-info text-dark" : "bg-secondary")">@u.Role</span>
+                                        <div class="vehicle-info">
+                                            <span class="fw-medium">@d.CarName</span>
+                                            <span class="plate-badge">@d.CarNumber</span>
+                                        </div>
                                     </td>
-                                    <td>@(u.Role == "Driver" ? $"{u.CarName} ({u.CarNumber})" : "--")</td>
-                                    <td>
-                                        <button class="btn btn-danger btn-sm" @onclick="() => DeleteUser(u.Id)">🚫 Ban User</button>
+                                    <td class="text-right action-cells">
+                                        <button class="btn-action btn-success" @onclick="() => ApproveDriver(d.Id)">Approve</button>
+                                        <button class="btn-action btn-danger-outline" @onclick="() => DeleteUser(d.Id)">Reject</button>
                                     </td>
                                 </tr>
                             }
@@ -88,73 +86,141 @@
                     </table>
                 </div>
             }
+        }
 
-            @if (activeTab == "history")
-            {
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-dark">📜 System-Wide Ride History</h5>
-                    <button class="btn btn-sm btn-outline-primary" @onclick="LoadHistory">🔄 Refresh</button>
+        @if (activeTab == "users")
+        {
+            <div class="section-header">
+                <h2>Manage Active Users</h2>
+                <p>View and manage all passengers and drivers on the platform.</p>
+            </div>
+            
+            <div class="table-container">
+                <table class="modern-table">
+                    <thead><tr><th>User</th><th>Role</th><th>Vehicle (If Driver)</th><th class="text-right">Actions</th></tr></thead>
+                    <tbody>
+                        @foreach (var u in allUsers)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="user-cell">
+                                        <div class="avatar @(u.Role == "Driver" ? "bg-emerald" : "bg-slate")">@u.FullName.FirstOrDefault()</div>
+                                        <div class="user-info">
+                                            <span class="fw-bold">@u.FullName <small class="id-tag">#@u.Id</small></span>
+                                            <span class="text-muted">@u.Username</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="role-badge @(u.Role == "Driver" ? "role-driver" : "role-passenger")">@u.Role</span>
+                                </td>
+                                <td>@(u.Role == "Driver" ? $"{u.CarName} ({u.CarNumber})" : "—")</td>
+                                <td class="text-right">
+                                    <button class="btn-icon-danger" title="Ban User" @onclick="() => DeleteUser(u.Id)">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        @if (activeTab == "history")
+        {
+            <div class="section-header d-flex-between">
+                <div>
+                    <h2>System-Wide Ride History</h2>
+                    <p>Real-time log of all platform transactions.</p>
                 </div>
+                <button class="btn-outline" @onclick="LoadHistory">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Refresh Data
+                </button>
+            </div>
 
-                <div class="table-responsive">
-                    <table class="table table-sm table-bordered">
-                        <thead class="bg-light"><tr><th>Ref</th><th>Passenger</th><th>Driver</th><th>Route</th><th>Price</th><th>Status</th></tr></thead>
-                        <tbody>
-                            @foreach (var r in globalHistory)
-                            {
-                                <tr>
-                                    <td>@r.Id</td>
-                                    <td>@r.PassengerName</td>
-                                    <td>@(r.DriverName ?? "--")</td>
-                                    <td><small>@r.PickupLocation ➝ @r.DropoffLocation</small></td>
-                                    <td class="fw-bold">@r.Price</td>
-                                    <td>
-                                        <span class="badge @(r.Status == "Completed" ? "bg-success" : r.Status == "Canceled" ? "bg-danger" : "bg-warning text-dark")">
-                                            @r.Status
-                                        </span>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
+            <div class="table-container">
+                <table class="modern-table history-table">
+                    <thead><tr><th>Ref</th><th>Passenger</th><th>Driver</th><th>Route</th><th>Price</th><th>Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var r in globalHistory)
+                        {
+                            <tr>
+                                <td class="text-muted small">#@r.Id</td>
+                                <td class="fw-medium">@r.PassengerName</td>
+                                <td class="fw-medium">@(r.DriverName ?? "—")</td>
+                                <td>
+                                    <div class="route-cell">
+                                        <span class="dot-start"></span> @r.PickupLocation
+                                        <svg class="route-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                                        <span class="dot-end"></span> @r.DropoffLocation
+                                    </div>
+                                </td>
+                                <td class="fw-bold text-dark">Rs @r.Price</td>
+                                <td>
+                                    <span class="status-badge @(r.Status.ToLower())">@r.Status</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
 
-            @if (activeTab == "admins")
-            {
-                <div class="row">
-                    <div class="col-md-7">
-                        <h5 class="fw-bold text-dark mb-3">🔑 Existing Admins</h5>
-                        <ul class="list-group">
-                            @foreach (var admin in adminList)
-                            {
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <span>@admin.FullName <small class="text-muted">(@admin.Username)</small></span>
-                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteUser(admin.Id)">Remove</button>
-                                </li>
-                            }
-                        </ul>
+        @if (activeTab == "admins")
+        {
+            <div class="admin-grid">
+                <div class="admin-list-card">
+                    <h2>Existing Admins</h2>
+                    <div class="admin-list">
+                        @foreach (var admin in adminList)
+                        {
+                            <div class="admin-item">
+                                <div class="user-cell">
+                                    <div class="avatar bg-rose">@admin.FullName.FirstOrDefault()</div>
+                                    <div class="user-info">
+                                        <span class="fw-bold">@admin.FullName</span>
+                                        <span class="text-muted">@admin.Username</span>
+                                    </div>
+                                </div>
+                                <button class="btn-text-danger" @onclick="() => DeleteUser(admin.Id)">Remove</button>
+                            </div>
+                        }
                     </div>
-                    <div class="col-md-5">
-                        <div class="p-3 bg-light rounded border">
-                            <h6 class="fw-bold">➕ Add New Admin</h6>
-                            <input @bind="newAdmin.FullName" class="form-control mb-2" placeholder="Full Name" />
-                            <input @bind="newAdmin.Username" class="form-control mb-2" placeholder="Username" />
-                            <input @bind="newAdmin.Password" type="password" class="form-control mb-2" placeholder="Password" />
-                            <button class="btn btn-dark w-100" @onclick="CreateAdmin">Create Admin</button>
+                </div>
+
+                <div class="admin-form-card">
+                    <div class="form-header">
+                        <div class="icon-circle"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg></div>
+                        <h3>Add New Admin</h3>
+                    </div>
+                    <div class="modern-form">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input @bind="newAdmin.FullName" class="custom-input" placeholder="e.g. Jane Doe" />
                         </div>
+                        <div class="input-group">
+                            <label>Username</label>
+                            <input @bind="newAdmin.Username" class="custom-input" placeholder="e.g. janedoe99" />
+                        </div>
+                        <div class="input-group">
+                            <label>Password</label>
+                            <input @bind="newAdmin.Password" type="password" class="custom-input" placeholder="••••••••" />
+                        </div>
+                        <button class="btn-primary-full" @onclick="CreateAdmin">Authorize Admin</button>
                     </div>
                 </div>
-            }
+            </div>
+        }
 
-        </div>
-    </div>
+    </main>
 </div>
 
 @code {
     private string activeTab = "pending";
 
-    // Lists
+    // Data Models
     private List<UserDto> pendingDrivers = new();
     private List<UserDto> allUsers = new();
     private List<UserDto> adminList = new();
@@ -167,21 +233,25 @@
         if (role != "Admin") { Nav.NavigateTo("/"); return; }
 
         await LoadData();
-        await LoadHistory(); // New Step
+        await LoadHistory(); 
+    }
+
+    private void SwitchTab(string tabName)
+    {
+        // Adding a tiny delay or just re-rendering triggers the CSS fade animation
+        activeTab = tabName;
+        StateHasChanged();
     }
 
     private async Task LoadData()
     {
         try
         {
-            // Existing endpoints
-            pendingDrivers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/pending-drivers");
-            adminList = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/list-admins");
-
-            // NEW: You need to add this endpoint to your Backend (AdminController)
-            allUsers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/users");
+            pendingDrivers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/pending-drivers") ?? new();
+            adminList = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/list-admins") ?? new();
+            allUsers = await Http.GetFromJsonAsync<List<UserDto>>("http://localhost:5001/api/admin/users") ?? new();
         }
-        catch { }
+        catch { /* Consider adding an error toast here in the future */ }
     }
 
     private async Task LoadHistory()
@@ -195,7 +265,7 @@
             var response = await Http.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
-                globalHistory = await response.Content.ReadFromJsonAsync<List<RideHistoryDto>>();
+                globalHistory = await response.Content.ReadFromJsonAsync<List<RideHistoryDto>>() ?? new();
             }
         }
         catch { }
@@ -209,7 +279,8 @@
 
     private async Task DeleteUser(int id)
     {
-        if (!await JSRuntime.InvokeAsync<bool>("confirm", "Permanently remove this user?")) return;
+        // UX Note: In a real enterprise app, replace this JS confirm with a custom Blazor Modal component.
+        if (!await JSRuntime.InvokeAsync<bool>("confirm", "Are you absolutely sure you want to remove this user? This action cannot be undone.")) return;
         var res = await Http.DeleteAsync($"http://localhost:5001/api/admin/delete/{id}");
         if (res.IsSuccessStatusCode) await LoadData();
     }
@@ -221,16 +292,13 @@
         {
             newAdmin = new RegisterDto();
             await LoadData();
-            await JSRuntime.InvokeVoidAsync("alert", "Admin Created!");
-        }
-        else
-        {
-            await JSRuntime.InvokeVoidAsync("alert", "Failed.");
+            // Optional: Replace alert with a sleek Toast notification library like Blazored.Toast
+            await JSRuntime.InvokeVoidAsync("alert", "Administrator successfully authorized!");
         }
     }
 
     // DTOs
-    public class UserDto { public int Id { get; set; } public string FullName { get; set; } public string Username { get; set; } public string Role { get; set; } public string CarName { get; set; } public string CarNumber { get; set; } }
-    public class RegisterDto { public string FullName { get; set; } public string Username { get; set; } public string Password { get; set; } }
-    public class RideHistoryDto { public int Id { get; set; } public string PassengerName { get; set; } public string DriverName { get; set; } public string PickupLocation { get; set; } public string DropoffLocation { get; set; } public decimal Price { get; set; } public string Status { get; set; } }
+    public class UserDto { public int Id { get; set; } public string FullName { get; set; } = ""; public string Username { get; set; } = ""; public string Role { get; set; } = ""; public string CarName { get; set; } = ""; public string CarNumber { get; set; } = ""; }
+    public class RegisterDto { public string FullName { get; set; } = ""; public string Username { get; set; } = ""; public string Password { get; set; } = ""; }
+    public class RideHistoryDto { public int Id { get; set; } public string PassengerName { get; set; } = ""; public string DriverName { get; set; } = ""; public string PickupLocation { get; set; } = ""; public string DropoffLocation { get; set; } = ""; public decimal Price { get; set; } public string Status { get; set; } = ""; }
 }

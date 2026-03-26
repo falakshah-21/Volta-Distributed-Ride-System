@@ -4,9 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Security.Cryptography;
 using Volta.Services.Auth.Data;
 using Volta.Services.Auth.Entities;
+// Note: System.Security.Cryptography hata diya gaya hai kyunke ab hum BCrypt use karenge.
 
 namespace Volta.Services.Auth.Controllers
 {
@@ -22,7 +22,7 @@ namespace Volta.Services.Auth.Controllers
             _context = context;
         }
 
-        // --- 1. REGISTER (Updated with Gatekeeper Logic) ---
+        // --- 1. REGISTER (Updated with BCrypt & Gatekeeper Logic) ---
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto request)
         {
@@ -38,12 +38,13 @@ namespace Volta.Services.Auth.Controllers
             // Passengers are approved immediately. Drivers must wait for Admin.
             bool isApproved = request.Role == "Passenger";
 
-            // D. Create User Object
+            // D. Create User Object (Using BCrypt for Password Hashing)
             var newUser = new User
             {
                 FullName = request.FullName,
                 Username = request.Username,
-                PasswordHash = ComputeSha256Hash(request.Password),
+                // PROFESSIONAL HASHING:
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password), 
                 Role = request.Role,
                 IsApproved = isApproved, // <--- SAVING THE STATUS HERE
 
@@ -66,31 +67,35 @@ namespace Volta.Services.Auth.Controllers
             return Ok(new { message = "Registration Successful!" });
         }
 
-        // --- 2. LOGIN (Updated with Approval Check) ---
+        // --- 2. LOGIN (Updated with BCrypt & Approval Check) ---
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto request)
         {
-            var hashedPassword = ComputeSha256Hash(request.Password);
-
-            // A. Find User
+            // A. Find User by Username ONLY
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.PasswordHash == hashedPassword);
+                .FirstOrDefaultAsync(u => u.Username == request.Username);
 
             if (user == null)
                 return Unauthorized(new { message = "Invalid Username or Password" });
 
-            // --- B. CHECK APPROVAL STATUS ---
+            // --- B. VERIFY PASSWORD USING BCRYPT ---
+            bool isValidPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash);
+
+            if (!isValidPassword)
+                return Unauthorized(new { message = "Invalid Username or Password" });
+
+            // --- C. CHECK APPROVAL STATUS ---
             if (!user.IsApproved)
             {
-                return Unauthorized(new { message = "⛔ Account Pending! An Admin must approve your driver account first." });
+                return Unauthorized(new { message = "Account Pending! An Admin must approve your driver account first." });
             }
 
-            // C. Generate Token
+            // D. Generate Token
             var token = GenerateJwtToken(user);
             return Ok(new { token, role = user.Role });
         }
 
-        // --- HELPER FUNCTIONS (Kept exactly the same) ---
+        // --- HELPER FUNCTIONS ---
         private string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>
@@ -113,19 +118,6 @@ namespace Volta.Services.Auth.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        private static string ComputeSha256Hash(string rawData)
-        {
-            using (SHA256 sha256Hash = SHA256.Create())
-            {
-                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-                StringBuilder builder = new StringBuilder();
-                for (int i = 0; i < bytes.Length; i++)
-                {
-                    builder.Append(bytes[i].ToString("x2"));
-                }
-                return builder.ToString();
-            }
-        }
     }
 
     // DTOs

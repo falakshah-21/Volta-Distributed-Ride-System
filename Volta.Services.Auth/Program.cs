@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Volta.Services.Auth.Data;
+using Volta.Services.Auth.Entities; // Yeh line add ki hai Entity ke liye
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,40 @@ builder.Services.AddControllers();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+// =======================================================
+// 🌟 PROFESSIONAL DATABASE SEEDING (AUTO-ADMIN CREATION)
+// =======================================================
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<AuthDbContext>();
+
+        // Check karte hain ke kya database mein koi Admin already majood hai?
+        if (!context.Users.Any(u => u.Role == "Admin"))
+        {
+            var defaultAdmin = new User
+            {
+                Username = "superadmin",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"), 
+                Role = "Admin",
+                IsApproved = true
+            };
+
+            context.Users.Add(defaultAdmin);
+            context.SaveChanges();
+            
+            Console.WriteLine("Default Admin User created successfully! (admin@volta.com / Admin@123)");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while seeding the database: {ex.Message}");
+    }
+}
+// =======================================================
 
 app.MapHealthChecks("/health");
 

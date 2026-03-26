@@ -125,3 +125,1897 @@ html, body {
     background-attachment: fixed !important;
     color: white !important;
 }
+
+/* --- Core Variables & Setup --- */
+:root {
+    --bg-main: #f8fafc;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --primary: #4f46e5;
+    --primary-hover: #4338ca;
+    --surface: #ffffff;
+    --border: #e2e8f0;
+    --danger: #ef4444;
+    --danger-bg: #fef2f2;
+    --success: #10b981;
+    --success-bg: #ecfdf5;
+    --warning: #f59e0b;
+    --warning-bg: #fffbeb;
+}
+
+.admin-dashboard {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--text-main);
+}
+
+/* --- Utility Classes --- */
+.fw-bold { font-weight: 700; }
+.fw-medium { font-weight: 500; }
+.text-muted { color: var(--text-muted); }
+.text-right { text-align: right; }
+.d-flex-between { display: flex; justify-content: space-between; align-items: center; }
+.w-4 { width: 1rem; } .h-4 { height: 1rem; }
+.w-5 { width: 1.25rem; } .h-5 { height: 1.25rem; }
+.w-6 { width: 1.5rem; } .h-6 { height: 1.5rem; }
+.mr-2 { margin-right: 0.5rem; }
+
+/* --- Header --- */
+.dashboard-header {
+    margin-bottom: 2rem;
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.icon-box {
+    background: linear-gradient(135deg, var(--primary), #818cf8);
+    color: white;
+    padding: 0.75rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+}
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    letter-spacing: -0.025em;
+}
+.page-subtitle {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* --- Buttons --- */
+.btn-glass {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+.btn-glass:hover {
+    background: var(--surface);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transform: translateY(-1px);
+}
+.btn-action {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+.btn-success { background: var(--success-bg); color: var(--success); }
+.btn-success:hover { background: var(--success); color: white; }
+.btn-danger-outline { background: transparent; border: 1px solid var(--border); color: var(--danger); }
+.btn-danger-outline:hover { background: var(--danger-bg); border-color: var(--danger); }
+.btn-outline {
+    display: flex; align-items: center;
+    padding: 0.5rem 1rem; border: 1px solid var(--border);
+    border-radius: 0.5rem; background: var(--surface);
+    cursor: pointer; transition: 0.2s;
+}
+.btn-outline:hover { background: #f1f5f9; }
+.btn-icon-danger {
+    background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.5rem;
+    border-radius: 0.375rem; transition: 0.2s;
+}
+.btn-icon-danger:hover { color: var(--danger); background: var(--danger-bg); }
+.btn-text-danger {
+    background: none; border: none; color: var(--danger); font-size: 0.875rem;
+    font-weight: 500; cursor: pointer;
+}
+.btn-text-danger:hover { text-decoration: underline; }
+.btn-primary-full {
+    width: 100%; padding: 0.75rem; background: var(--text-main); color: white;
+    border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+}
+.btn-primary-full:hover { background: black; }
+
+/* --- Tabs Navigation --- */
+.custom-tabs {
+    display: flex;
+    gap: 1rem;
+    background: var(--surface);
+    padding: 0.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+}
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.tab-btn:hover { color: var(--text-main); background: #f8fafc; }
+.tab-btn.active-tab {
+    background: #0f172a !important; 
+    color: #ffffff !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+}
+.badge-pulse {
+    background: var(--danger);
+    color: white;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    animation: pulse 2s infinite;
+}
+
+/* --- Main Card & Sections --- */
+.dashboard-card {
+    background: var(--surface);
+    border-radius: 1rem;
+    border: 1px solid var(--border);
+    min-height: 400px;
+    padding: 2rem;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+}
+.section-header { margin-bottom: 2rem; }
+.section-header h2 { font-size: 1.25rem; font-weight: 700; margin: 0 0 0.25rem 0; }
+.section-header p { margin: 0; color: var(--text-muted); font-size: 0.875rem; }
+
+/* --- Empty State --- */
+.empty-state {
+    text-align: center; padding: 4rem 2rem; background: #f8fafc; border-radius: 1rem;
+    border: 2px dashed var(--border);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty-state h3 { margin: 0 0 0.5rem 0; font-weight: 600; }
+.empty-state p { color: var(--text-muted); margin: 0; }
+
+/* --- Tables --- */
+.table-container { overflow-x: auto; }
+.modern-table { width: 100%; border-collapse: collapse; text-align: left; }
+.modern-table th {
+    padding: 1rem; border-bottom: 1px solid var(--border); color: var(--text-muted);
+    font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.modern-table td { padding: 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.modern-table tbody tr { transition: background-color 0.2s; }
+.modern-table tbody tr:hover { background-color: #f8fafc; }
+
+/* --- Table Elements --- */
+.user-cell { display: flex; align-items: center; gap: 1rem; }
+.avatar {
+    width: 2.5rem; height: 2.5rem; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-weight: bold; color: white; font-size: 1rem;
+}
+.bg-indigo { background: var(--primary); }
+.bg-emerald { background: var(--success); }
+.bg-slate { background: var(--text-muted); }
+.bg-rose { background: var(--danger); }
+
+.user-info { display: flex; flex-direction: column; }
+.user-info span.fw-bold { font-size: 0.95rem; }
+.user-info span.text-muted { font-size: 0.8125rem; }
+.id-tag { color: var(--text-muted); font-weight: normal; margin-left: 0.25rem; }
+
+.vehicle-info { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+.plate-badge {
+    background: #f1f5f9; border: 1px solid var(--border); padding: 0.1rem 0.4rem;
+    border-radius: 0.25rem; font-size: 0.75rem; font-family: monospace; font-weight: bold;
+}
+
+.role-badge {
+    padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+}
+.role-driver { background: var(--success-bg); color: var(--success); }
+.role-passenger { background: #f1f5f9; color: var(--text-muted); }
+
+.route-cell { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--text-muted); }
+.dot-start { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; }
+.dot-end { width: 8px; height: 8px; background: var(--success); border-radius: 50%; }
+.route-arrow { width: 14px; height: 14px; color: #cbd5e1; }
+
+.status-badge {
+    padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; text-transform: capitalize;
+}
+.status-badge.completed { background: var(--success-bg); color: var(--success); }
+.status-badge.canceled { background: var(--danger-bg); color: var(--danger); }
+.status-badge.pending { background: var(--warning-bg); color: var(--warning); }
+
+/* --- Admins Grid --- */
+.admin-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 2rem; }
+.admin-list-card h2 { font-size: 1.125rem; margin-bottom: 1.5rem; font-weight: 600; }
+.admin-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.admin-item {
+    display: flex; justify-content: space-between; align-items: center; padding: 1rem;
+    border: 1px solid var(--border); border-radius: 0.75rem; transition: 0.2s;
+}
+.admin-item:hover { border-color: #cbd5e1; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+
+.admin-form-card { background: #f8fafc; padding: 1.5rem; border-radius: 1rem; border: 1px solid var(--border); }
+.form-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+.icon-circle { background: white; padding: 0.5rem; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.form-header h3 { margin: 0; font-size: 1.125rem; font-weight: 600; }
+
+.modern-form .input-group { margin-bottom: 1rem; }
+.modern-form label { display: block; font-size: 0.8125rem; font-weight: 600; color: var(--text-muted); margin-bottom: 0.5rem; }
+.custom-input {
+    width: 100%; padding: 0.625rem 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem;
+    font-size: 0.875rem; transition: all 0.2s; box-sizing: border-box;
+}
+.custom-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+/* --- Animations --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* --- Volta Booking Flow Styles --- */
+.volta-booking-wrapper {
+    position: relative;
+    height: 100%; /* NEW: Let it fill your .content-area naturally */
+    min-height: 600px; /* Ensures the map has enough room to breathe */
+    width: 100%;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #e2e8f0;
+}
+
+/* Map takes full screen behind the panel */
+.volta-booking-wrapper .map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.volta-booking-wrapper #map {
+    width: 100%;
+    height: 100%;
+}
+
+/* Floating Sidebar Panel */
+.volta-booking-wrapper .booking-sidebar {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    width: 400px;
+    max-width: calc(100vw - 2rem);
+    height: calc(100% - 2rem);
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.25rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.volta-booking-wrapper .sidebar-header {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    gap: 1rem;
+}
+
+.volta-booking-wrapper .btn-back {
+    background: #f8fafc;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #475569;
+    transition: 0.2s;
+}
+
+.volta-booking-wrapper .btn-back:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.volta-booking-wrapper .sidebar-content {
+    padding: 1.5rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+/* Status Alert */
+.volta-booking-wrapper .status-alert {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    color: #334155;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volta-booking-wrapper .status-dot {
+    width: 8px;
+    height: 8px;
+    background: #3b82f6;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+
+/* iOS Style Segmented Control */
+.volta-booking-wrapper .segmented-control {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 0.75rem;
+    padding: 0.25rem;
+    position: relative;
+}
+
+.volta-booking-wrapper .segment-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.volta-booking-wrapper .segment-btn.active.pickup {
+    background: white;
+    color: #10b981;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.volta-booking-wrapper .segment-btn.active.dropoff {
+    background: white;
+    color: #ef4444;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Location Inputs */
+.volta-booking-wrapper .location-inputs {
+    position: relative;
+    padding-left: 0.5rem;
+}
+
+.volta-booking-wrapper .input-line-connector {
+    position: absolute;
+    left: 14px;
+    top: 2rem;
+    bottom: 3rem;
+    width: 2px;
+    background: #e2e8f0;
+    z-index: 0;
+}
+
+.volta-booking-wrapper .input-wrapper {
+    display: flex;
+    gap: 1rem;
+    position: relative;
+    z-index: 1;
+}
+
+.volta-booking-wrapper .icon-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 2.2rem;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #e2e8f0;
+}
+
+.volta-booking-wrapper .pickup-icon { background: #10b981; }
+.volta-booking-wrapper .dropoff-icon { background: #ef4444; }
+
+.volta-booking-wrapper label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    display: block;
+}
+
+.volta-booking-wrapper .search-box {
+    display: flex;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    transition: 0.2s;
+}
+
+.volta-booking-wrapper .search-box:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.volta-booking-wrapper .search-box input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: #0f172a;
+    outline: none;
+}
+
+.volta-booking-wrapper .btn-search {
+    background: transparent;
+    border: none;
+    padding: 0 1rem;
+    color: #64748b;
+    cursor: pointer;
+}
+.volta-booking-wrapper .btn-search svg { width: 1.25rem; height: 1.25rem; }
+
+/* Route Summary Card */
+.volta-booking-wrapper .route-summary {
+    display: flex;
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.volta-booking-wrapper .summary-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+}
+
+.volta-booking-wrapper .summary-item svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #0284c7;
+}
+
+.volta-booking-wrapper .summary-divider {
+    width: 1px;
+    background: #bae6fd;
+    margin: 0 1rem;
+}
+
+/* Price Offer Section */
+.volta-booking-wrapper .price-offer-section {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.volta-booking-wrapper .price-input-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.volta-booking-wrapper .currency {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
+.volta-booking-wrapper .price-input {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #0f172a;
+    border: none;
+    width: 120px;
+    text-align: left;
+    outline: none;
+    background: transparent;
+}
+
+/* Footer & Book Button */
+.volta-booking-wrapper .sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.volta-booking-wrapper .btn-book-now {
+    width: 100%;
+    padding: 1rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #0f172a 0%, #312e81 100%);
+    color: white;
+    font-size: 1.125rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.volta-booking-wrapper .btn-book-now:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+}
+
+.slide-down { animation: slideDown 0.3s ease-out; }
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in { animation: fadeIn 0.4s ease-in; }
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .volta-booking-wrapper .booking-sidebar {
+        top: auto;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        max-height: 80vh;
+        border-radius: 1.5rem 1.5rem 0 0;
+    }
+}
+
+/* --- Volta Ride History Styles --- */
+.volta-history-wrapper {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 60px);
+    padding: 2rem 1rem;
+    color: #0f172a;
+}
+
+.volta-history-wrapper .history-container {
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+/* Typography & Utilities */
+.volta-history-wrapper .fw-bold { font-weight: 700; }
+.volta-history-wrapper .fw-medium { font-weight: 500; }
+.volta-history-wrapper .text-muted { color: #64748b; }
+.volta-history-wrapper .text-right { text-align: right; }
+.volta-history-wrapper .italic { font-style: italic; }
+.volta-history-wrapper .w-12 { width: 3rem; }
+.volta-history-wrapper .h-12 { height: 3rem; }
+
+/* Header */
+.volta-history-wrapper .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+}
+
+.volta-history-wrapper .page-title {
+    font-size: 1.875rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    letter-spacing: -0.025em;
+}
+
+.volta-history-wrapper .page-subtitle {
+    margin: 0;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.volta-history-wrapper .btn-refresh {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #3b82f6;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s;
+}
+
+.volta-history-wrapper .btn-refresh:hover:not(:disabled) {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.volta-history-wrapper .btn-refresh svg {
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.volta-history-wrapper .btn-refresh.spinning svg {
+    animation: spin 1s linear infinite;
+}
+
+/* Card Container */
+.volta-history-wrapper .history-card {
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -1px rgba(0,0,0,0.02);
+}
+
+/* Table Styles */
+.volta-history-wrapper .table-responsive {
+    overflow-x: auto;
+}
+
+.volta-history-wrapper .history-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.volta-history-wrapper .history-table th {
+    background-color: #f8fafc;
+    padding: 1rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.volta-history-wrapper .history-table td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.volta-history-wrapper .history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.volta-history-wrapper .table-row-hover:hover {
+    background-color: #fcfcfd;
+}
+
+/* Timeline Route Visual */
+.volta-history-wrapper .route-timeline {
+    position: relative;
+    padding-left: 1.5rem;
+    display: flex;
+}
+
+.volta-history-wrapper .timeline-point {
+    position: absolute;
+    left: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px #cbd5e1;
+}
+
+.volta-history-wrapper .timeline-point.pickup {
+    top: 4px;
+    background-color: #10b981;
+}
+
+.volta-history-wrapper .timeline-point.dropoff {
+    bottom: 4px;
+    background-color: #ef4444;
+}
+
+.volta-history-wrapper .timeline-line {
+    position: absolute;
+    left: 4px;
+    top: 14px;
+    bottom: 14px;
+    width: 2px;
+    background-color: #e2e8f0;
+}
+
+.volta-history-wrapper .route-locations {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.volta-history-wrapper .location-text {
+    font-size: 0.875rem;
+    line-height: 1.2;
+}
+
+/* Driver Avatar */
+.volta-history-wrapper .driver-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.volta-history-wrapper .driver-avatar {
+    width: 2rem;
+    height: 2rem;
+    background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+/* Price & Status */
+.volta-history-wrapper .currency-symbol {
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-right: 2px;
+}
+
+.volta-history-wrapper .status-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    display: inline-block;
+}
+
+.volta-history-wrapper .status-completed {
+    background-color: #ecfdf5;
+    color: #10b981;
+    border: 1px solid #a7f3d0;
+}
+
+.volta-history-wrapper .status-canceled {
+    background-color: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+
+.volta-history-wrapper .status-pending {
+    background-color: #fffbeb;
+    color: #f59e0b;
+    border: 1px solid #fde68a;
+}
+
+/* Empty State */
+.volta-history-wrapper .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.volta-history-wrapper .empty-icon-wrapper {
+    background: #f1f5f9;
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem auto;
+    color: #94a3b8;
+}
+
+.volta-history-wrapper .empty-state h3 {
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.volta-history-wrapper .empty-state p {
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.volta-history-wrapper .btn-primary-inline {
+    display: inline-block;
+    background: #0f172a;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background 0.2s;
+}
+
+.volta-history-wrapper .btn-primary-inline:hover {
+    background: #334155;
+    color: white;
+}
+
+/* Skeleton Loader */
+.volta-history-wrapper .skeleton-wrapper {
+    padding: 1.5rem;
+}
+
+.volta-history-wrapper .skeleton-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+}
+
+.volta-history-wrapper .skeleton-row:last-child {
+    margin-bottom: 0;
+}
+
+.volta-history-wrapper .skeleton-box {
+    height: 1.25rem;
+    background: #e2e8f0;
+    border-radius: 0.25rem;
+    animation: pulse-bg 1.5s infinite;
+}
+
+.volta-history-wrapper .w-10 { width: 10%; }
+.volta-history-wrapper .w-40 { width: 40%; }
+.volta-history-wrapper .w-20 { width: 20%; }
+.volta-history-wrapper .w-15 { width: 15%; margin-left: auto; }
+
+/* Animations */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes pulse-bg {
+    0% { background-color: #e2e8f0; }
+    50% { background-color: #cbd5e1; }
+    100% { background-color: #e2e8f0; }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.volta-history-wrapper .fade-in-up {
+    animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* --- Volta Dashboard Styles --- */
+.volta-dashboard-wrapper {
+    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #f8fafc;
+    min-height: 100%;
+    padding: 2rem 1rem;
+    color: #0f172a;
+}
+
+.volta-dashboard-wrapper .dashboard-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Utilities */
+.volta-dashboard-wrapper .fw-bold { font-weight: 700; }
+.volta-dashboard-wrapper .text-muted { color: #64748b; }
+.volta-dashboard-wrapper .w-4 { width: 1rem; } .volta-dashboard-wrapper .h-4 { height: 1rem; }
+.volta-dashboard-wrapper .w-5 { width: 1.25rem; } .volta-dashboard-wrapper .h-5 { height: 1.25rem; }
+.volta-dashboard-wrapper .mr-2 { margin-right: 0.5rem; }
+
+/* Header */
+.volta-dashboard-wrapper .dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2.5rem;
+}
+
+.volta-dashboard-wrapper .logo-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.volta-dashboard-wrapper .logo-icon {
+    background: #0f172a;
+    color: #38bdf8;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.volta-dashboard-wrapper .logo-icon svg { width: 1.75rem; height: 1.75rem; }
+
+.volta-dashboard-wrapper .brand-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.1rem 0;
+    letter-spacing: -0.025em;
+}
+
+.volta-dashboard-wrapper .role-badge {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.volta-dashboard-wrapper .role-badge.driver { background: #dcfce7; color: #166534; }
+.volta-dashboard-wrapper .role-badge.passenger { background: #e0e7ff; color: #3730a3; }
+.volta-dashboard-wrapper .role-badge.guest { background: #f1f5f9; color: #475569; }
+
+.volta-dashboard-wrapper .btn-logout {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.volta-dashboard-wrapper .btn-logout:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+/* Loading State */
+.volta-dashboard-wrapper .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.volta-dashboard-wrapper .pulse-ring {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 3px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+/* --- ACTIVE RIDE CARD (Premium Tracker) --- */
+.volta-dashboard-wrapper .active-ride-card {
+    background: white;
+    border-radius: 1.25rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
+    border: 1px solid #e2e8f0;
+}
+
+.volta-dashboard-wrapper .card-glow-border {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, #10b981, #3b82f6);
+}
+
+.volta-dashboard-wrapper .ride-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    background: #fafaf9;
+}
+
+.volta-dashboard-wrapper .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volta-dashboard-wrapper .live-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+}
+.volta-dashboard-wrapper .live-dot.warning { background: #f59e0b; animation: pulse-warn 2s infinite; }
+.volta-dashboard-wrapper .live-dot.success { background: #10b981; animation: pulse-succ 2s infinite; }
+
+.volta-dashboard-wrapper .ride-price {
+    background: #0f172a;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    font-weight: 800;
+}
+.volta-dashboard-wrapper .ride-price .currency { font-size: 0.75rem; opacity: 0.8; margin-right: 2px;}
+
+.volta-dashboard-wrapper .ride-body { padding: 1.5rem; }
+
+.volta-dashboard-wrapper .route-timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.volta-dashboard-wrapper .timeline-point {
+    position: absolute; left: 4px; width: 12px; height: 12px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 0 1px #cbd5e1;
+}
+.volta-dashboard-wrapper .timeline-point.pickup { top: 4px; background: #10b981; }
+.volta-dashboard-wrapper .timeline-point.dropoff { bottom: 4px; background: #ef4444; }
+.volta-dashboard-wrapper .timeline-line {
+    position: absolute; left: 9px; top: 18px; bottom: 18px; width: 2px; background: #e2e8f0;
+}
+
+.volta-dashboard-wrapper .route-locations {
+    display: flex; flex-direction: column; gap: 1.5rem;
+}
+.volta-dashboard-wrapper .location small {
+    display: block; font-size: 0.7rem; font-weight: 700; color: #94a3b8; letter-spacing: 0.05em; margin-bottom: 0.25rem;
+}
+.volta-dashboard-wrapper .location span { font-size: 1.125rem; color: #0f172a; }
+
+.volta-dashboard-wrapper .driver-info-box {
+    display: flex; align-items: center; gap: 1rem; background: #f8fafc; padding: 1rem; border-radius: 0.75rem; border: 1px solid #e2e8f0;
+}
+.volta-dashboard-wrapper .driver-avatar {
+    width: 2.5rem; height: 2.5rem; background: #38bdf8; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold;
+}
+
+.volta-dashboard-wrapper .ride-actions {
+    display: flex; gap: 1rem; padding: 1.5rem; background: #f8fafc; border-top: 1px solid #e2e8f0;
+}
+.volta-dashboard-wrapper .btn-action-primary, .volta-dashboard-wrapper .btn-action-danger {
+    flex: 1; padding: 0.875rem; border: none; border-radius: 0.75rem; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center;
+}
+.volta-dashboard-wrapper .btn-action-primary { background: #10b981; color: white; }
+.volta-dashboard-wrapper .btn-action-primary:hover { background: #059669; }
+.volta-dashboard-wrapper .btn-action-danger { background: white; color: #ef4444; border: 1px solid #fecaca; }
+.volta-dashboard-wrapper .btn-action-danger:hover { background: #fef2f2; }
+
+/* --- DRIVER FEED (Radar & Job Cards) --- */
+.volta-dashboard-wrapper .feed-header {
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;
+}
+.volta-dashboard-wrapper .radar-indicator { display: flex; align-items: center; gap: 0.75rem; }
+.volta-dashboard-wrapper .radar-dot { width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; animation: pulse-warn 2s infinite; }
+.volta-dashboard-wrapper .btn-icon { background: white; border: 1px solid #e2e8f0; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #64748b; }
+
+.volta-dashboard-wrapper .empty-radar {
+    text-align: center; padding: 4rem 2rem; background: white; border-radius: 1rem; border: 2px dashed #cbd5e1; color: #64748b;
+}
+.volta-dashboard-wrapper .radar-circle {
+    width: 4rem; height: 4rem; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem auto; color: #94a3b8; animation: pulse-ring 2s infinite;
+}
+
+.volta-dashboard-wrapper .job-cards-grid { display: flex; flex-direction: column; gap: 1rem; }
+.volta-dashboard-wrapper .job-card {
+    background: white; border-radius: 1rem; padding: 1.25rem; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 1rem; transition: transform 0.2s;
+}
+.volta-dashboard-wrapper .job-card:hover { transform: translateY(-2px); border-color: #cbd5e1; }
+.volta-dashboard-wrapper .job-price { font-size: 1.5rem; font-weight: 800; color: #0f172a; }
+.volta-dashboard-wrapper .job-location { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #475569; margin-bottom: 0.5rem; }
+.volta-dashboard-wrapper .job-location .dot { width: 8px; height: 8px; border-radius: 50%; }
+.volta-dashboard-wrapper .job-location .dot.pickup { background: #10b981; }
+.volta-dashboard-wrapper .job-location .dot.dropoff { background: #ef4444; }
+.volta-dashboard-wrapper .btn-accept {
+    width: 100%; background: #0f172a; color: white; border: none; padding: 0.75rem; border-radius: 0.5rem; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.volta-dashboard-wrapper .btn-accept:hover { background: #3b82f6; }
+
+/* --- PASSENGER HOME (Where to?) --- */
+.volta-dashboard-wrapper .passenger-home { padding-top: 2rem; }
+.volta-dashboard-wrapper .booking-prompt-card {
+    background: white; border-radius: 1.5rem; padding: 2rem; text-align: center; border: 1px solid #e2e8f0;
+}
+.volta-dashboard-wrapper .booking-prompt-card h2 { font-weight: 800; font-size: 2rem; margin-bottom: 1.5rem; color: #0f172a; }
+
+.volta-dashboard-wrapper .mock-input {
+    display: flex; align-items: center; gap: 1rem; background: #f1f5f9; padding: 1.25rem 1.5rem; border-radius: 1rem; color: #64748b; font-size: 1.125rem; font-weight: 500; cursor: pointer; transition: 0.2s; margin-bottom: 2rem;
+}
+.volta-dashboard-wrapper .mock-input:hover { background: #e2e8f0; color: #0f172a; }
+.volta-dashboard-wrapper .search-icon { width: 1.5rem; height: 1.5rem; color: #0f172a; }
+
+.volta-dashboard-wrapper .quick-actions { display: flex; justify-content: center; gap: 2rem; }
+.volta-dashboard-wrapper .action-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; cursor: pointer; color: #475569; font-weight: 600; font-size: 0.875rem; transition: 0.2s; }
+.volta-dashboard-wrapper .action-btn:hover { color: #0f172a; transform: translateY(-2px); }
+.volta-dashboard-wrapper .action-icon { width: 4rem; height: 4rem; border-radius: 1rem; display: flex; align-items: center; justify-content: center; color: white; margin-bottom: 0.25rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+.volta-dashboard-wrapper .action-icon svg { width: 2rem; height: 2rem; }
+.volta-dashboard-wrapper .bg-blue { background: #3b82f6; }
+.volta-dashboard-wrapper .bg-dark { background: #0f172a; }
+
+/* Animations */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+@keyframes pulse-warn { 0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); } 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); } }
+@keyframes pulse-succ { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+@keyframes pulse-ring { 0% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0.3); } 70% { box-shadow: 0 0 0 15px rgba(148, 163, 184, 0); } 100% { box-shadow: 0 0 0 0 rgba(148, 163, 184, 0); } }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.volta-dashboard-wrapper .fade-in-up { animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+/* --- Volta Authentication Styles --- */
+.volta-auth-wrapper {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    /* If your AuthLayout doesn't center vertically, add: margin-top: 10vh; */
+}
+
+.volta-auth-wrapper .auth-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2.5rem 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Subtle top border accent matching your brand */
+.volta-auth-wrapper .auth-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 6px;
+    background: var(--volta-gradient, linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%));
+}
+
+.volta-auth-wrapper .auth-logo {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: #f8fafc;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3f51b5; /* Volta brand color */
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+}
+
+.volta-auth-wrapper .auth-logo svg {
+    width: 2rem; height: 2rem;
+}
+
+/* Alert Box */
+.volta-auth-wrapper .auth-alert {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #ef4444;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volta-auth-wrapper .alert-icon {
+    flex-shrink: 0;
+}
+
+/* Form Elements */
+.volta-auth-wrapper .input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.volta-auth-wrapper label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.volta-auth-wrapper .forgot-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3f51b5;
+    text-decoration: none;
+}
+
+.volta-auth-wrapper .forgot-link:hover { text-decoration: underline; }
+
+.volta-auth-wrapper .input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.volta-auth-wrapper .icon-wrapper {
+    position: absolute;
+    left: 1rem;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.volta-auth-wrapper .icon-wrapper svg { width: 1.25rem; height: 1.25rem; }
+
+.volta-auth-wrapper .custom-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem; /* Extra left padding for icon */
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    font-size: 0.95rem;
+    color: #0f172a;
+    transition: all 0.2s;
+    box-sizing: border-box;
+}
+
+.volta-auth-wrapper .custom-input:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #3f51b5;
+    box-shadow: 0 0 0 4px rgba(63, 81, 181, 0.1);
+}
+
+.volta-auth-wrapper .btn-toggle-password {
+    position: absolute;
+    right: 0.5rem;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    transition: 0.2s;
+}
+
+.volta-auth-wrapper .btn-toggle-password:hover { color: #0f172a; background: #e2e8f0; }
+.volta-auth-wrapper .btn-toggle-password svg { width: 1.25rem; height: 1.25rem; }
+
+/* Main Login Button */
+.volta-auth-wrapper .btn-primary-full {
+    width: 100%;
+    padding: 1rem;
+    background: var(--volta-gradient, linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%));
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(63, 81, 181, 0.2);
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.volta-auth-wrapper .btn-primary-full:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(63, 81, 181, 0.3);
+}
+
+.volta-auth-wrapper .btn-primary-full:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.volta-auth-wrapper .link-primary { color: #3f51b5; text-decoration: none; }
+.volta-auth-wrapper .link-primary:hover { text-decoration: underline; }
+
+/* Animations */
+@keyframes spin { 100% { transform: rotate(360deg); } }
+.volta-auth-wrapper .spinner {
+    width: 1.25rem; height: 1.25rem;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.volta-auth-wrapper .slide-down { animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+.volta-auth-wrapper .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- Volta Registration Specific Styles --- */
+
+/* Grid for side-by-side inputs (like Password & Confirm) */
+.volta-auth-wrapper .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+/* Visual Role Selector (Replaces standard select) */
+.volta-auth-wrapper .role-selector {
+    display: flex;
+    gap: 1rem;
+}
+
+.volta-auth-wrapper .role-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.volta-auth-wrapper .role-btn svg {
+    width: 2rem;
+    height: 2rem;
+    transition: transform 0.2s;
+}
+
+.volta-auth-wrapper .role-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.volta-auth-wrapper .role-btn.active {
+    background: #eef2ff;
+    border-color: #3f51b5; /* Volta primary color */
+    color: #3f51b5;
+    box-shadow: 0 4px 6px -1px rgba(63, 81, 181, 0.1);
+}
+
+.volta-auth-wrapper .role-btn.active svg {
+    transform: scale(1.1);
+}
+
+/* Expanding Driver Details Drawer */
+.volta-auth-wrapper .driver-details-drawer {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.volta-auth-wrapper .driver-details-drawer.open {
+    max-height: 300px; /* Arbitrary large enough height */
+    opacity: 1;
+}
+
+.volta-auth-wrapper .drawer-content {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-top: 0.5rem;
+}
+
+/* Custom visual divider for the drawer */
+.volta-auth-wrapper .divider-with-text {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.volta-auth-wrapper .divider-with-text::before,
+.volta-auth-wrapper .divider-with-text::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.volta-auth-wrapper .divider-with-text::before { margin-right: .5em; }
+.volta-auth-wrapper .divider-with-text::after { margin-left: .5em; }
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    .volta-auth-wrapper .input-grid {
+        grid-template-columns: 1fr; /* Stack inputs on very small screens */
+        gap: 0.75rem;
+    }
+}
+
+/* --- Volta 404 (Not Found) Styles --- */
+.volta-404-wrapper {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8fafc;
+    /* Clever UI trick: CSS radial gradient to create a subtle map dot-grid */
+    background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+    background-size: 24px 24px;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    position: fixed;
+    top: 0; left: 0; z-index: 9999; /* Ensures it covers everything */
+}
+
+.volta-404-wrapper .lost-container {
+    text-align: center;
+    max-width: 450px;
+    padding: 3.5rem 2.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 1.5rem;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.8);
+    position: relative;
+}
+
+/* Animated Compass Graphic */
+.volta-404-wrapper .svg-container {
+    position: relative;
+    display: inline-block;
+}
+
+.volta-404-wrapper .compass-svg {
+    width: 120px;
+    height: 120px;
+    color: #94a3b8;
+}
+
+.volta-404-wrapper .compass-needle {
+    color: #3f51b5; /* Volta brand color */
+    transform-origin: center;
+    /* Custom bezier curve to make the spinning look confused and erratic */
+    animation: spin-wildly 3s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.volta-404-wrapper .error-badge {
+    position: absolute;
+    bottom: 5px;
+    right: -10px;
+    background: #ef4444;
+    color: white;
+    font-weight: 800;
+    font-size: 0.875rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    border: 3px solid white;
+    box-shadow: 0 4px 6px rgba(239, 68, 68, 0.3);
+}
+
+/* Button Styling */
+.volta-404-wrapper .btn-reroute {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 2rem;
+    background: #0f172a;
+    color: white;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+
+.volta-404-wrapper .btn-reroute:hover {
+    background: #3f51b5;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(63,81,181,0.3);
+}
+
+.volta-404-wrapper .w-5 { width: 1.25rem; }
+.volta-404-wrapper .h-5 { height: 1.25rem; }
+.volta-404-wrapper .mr-2 { margin-right: 0.5rem; }
+
+/* Animations */
+@keyframes spin-wildly {
+    0% { transform: rotate(0deg); }
+    15% { transform: rotate(180deg); }
+    30% { transform: rotate(140deg); }
+    50% { transform: rotate(320deg); }
+    70% { transform: rotate(260deg); }
+    100% { transform: rotate(720deg); }
+}
+
+@keyframes pulse-error {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.volta-404-wrapper .pulse-error { animation: pulse-error 2s infinite; }
+.volta-404-wrapper .fade-in-up { animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+@keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- Global Auth Layout Fix --- */
+.volta-auth-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+.auth-brand-panel {
+    width: 45% !important;
+    background: linear-gradient(135deg, #0f172a 0%, #312e81 100%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    position: relative;
+}
+
+.auth-form-panel {
+    width: 55% !important;
+    background-color: #f8fafc !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure the logo wrapper doesn't collapse */
+.brand-logo-wrapper {
+    width: 80px !important;
+    height: 80px !important;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-bottom: 1.5rem;
+}
+
+/* Typography fix for the brand side */
+.brand-title {
+    font-size: 3.5rem !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+    color: white !important;
+}
+
+/* Re-add the mobile fix just in case */
+@media (max-width: 992px) {
+    .auth-brand-panel { display: none !important; }
+    .auth-form-panel { width: 100% !important; }
+}
+
+/* --- Main Layout: Shell & Navigation --- */
+.volta-app-shell {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Sidebar & Navbar share this master gradient */
+.volta-sidebar, .top-navbar {
+    background: linear-gradient(135deg, #1e1e2f 0%, #3f51b5 100%);
+    background-attachment: fixed; /* Seamless L-shape magic */
+    color: white;
+}
+
+.volta-sidebar {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+}
+
+.brand-section {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.brand-logo {
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem;
+    border-radius: 0.75rem;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+}
+
+.brand-text h1 {
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+}
+
+.brand-text small {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+}
+
+.nav-container {
+    flex: 1;
+    padding: 1.5rem 0;
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.footer-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.1);
+    margin-bottom: 1rem;
+}
+
+/* Main Content Wrapper */
+.main-stage {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #f8fafc;
+}
+
+.top-navbar {
+    height: 120px;
+    display: flex;
+    align-items: center;
+    padding: 0 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 90;
+}
+
+.slogan-group h4 {
+    font-weight: 300;
+    font-size: 1.25rem;
+    letter-spacing: 1px;
+}
+
+.content-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    position: relative;
+    /* This ensures children with 100% height fill correctly */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Mobile Responsive Adjustments */
+@media (max-width: 768px) {
+    .volta-sidebar {
+        display: none; /* Consider implementing a hamburger menu later */
+    }
+    .top-navbar {
+        height: 80px;
+        padding: 0 1rem;
+    }
+    .slogan-group h4 {
+        font-size: 1rem;
+    }
+}
+
+.volta-nav-list {
+    padding: 0 0.75rem;
+}
+
+.nav-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+/* Base Link Style */
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    color: rgba(255, 255, 255, 0.65);
+    text-decoration: none;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    font-size: 0.9375rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-item:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Active State */
+.nav-item.active {
+    color: white;
+    background: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Admin Link Specifics */
+.admin-link {
+    color: #fbbf24; /* Warning Amber */
+}
+.admin-link.active {
+    background: rgba(251, 191, 36, 0.15);
+    color: #fbbf24;
+}
+
+/* Icon Sizing */
+.nav-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.nav-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Labels */
+.section-label {
+    padding: 0 1rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.35);
+    margin-bottom: 0.5rem;
+}
+
+/* --- Dashboard Visibility Fix --- */
+.content-area, .main-stage, .main-wrapper {
+    /* A premium light-to-blue gradient for better contrast */
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%) !important;
+}
+
+/* Ensure the Brand text in the Dashboard stands out */
+.brand-title, .volta-dashboard-wrapper h1, .brand-text h1 {
+    color:#e0e7ff !important; /* Deep dark blue/black for visibility */
+}
+
+/* Fix for the invisible "Volta" text in your screenshot */
+.logo-section .brand-title {
+    color: #1e1e2f !important;
+}
+
+.booking-prompt-card {
+    background: white !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02) !important;
+}
+
+.mock-input {
+    background: #f1f5f9 !important;
+    border: 1px solid #e2e8f0 !important;
+}
+
+/* --- Global Dashboard & Navbar Visibility Fixes --- */
+
+/* 1. Kills the white/blue outline on reload (Accessibility Focus) */
+h1:focus, .brand-title:focus, .logo-section:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
+
+/* 2. Forces 'Volta' text visibility on the light dashboard background */
+.volta-dashboard-wrapper .brand-title {
+    color: #ffffff !important; /* Deep Navy */
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+/* 3. Dashboard Background Gradient (Replaces plain white) */
+.main-stage, .content-area {
+    background: linear-gradient(135deg, #f8fafc 0%, #eef2ff 100%) !important;
+}
+
+/* 4. Keeps the Navbar branding white (Since it's on the dark sidebar) */
+.brand-section .brand-text h1 {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* --- Sidebar (Left Side) Branding Polish --- */
+
+/* 1. Force the Sidebar text and logo to be light */
+.sidebar .brand-box h1, 
+.volta-sidebar .brand-text h1,
+.sidebar .brand-box small {
+    color: #ffffff !important;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3); /* Adds depth to the light text */
+}
+
+/* 2. Style the Lightning Bolt icon on the left */
+.sidebar .brand-logo svg,
+.volta-sidebar .brand-logo svg {
+    color: #38bdf8 !important; /* Premium Electric Blue */
+    filter: drop-shadow(0 0 5px rgba(56, 189, 248, 0.5));
+}
+
+/* 3. Global fix to remove that white/blue outline on reload */
+h1:focus, .brand-title:focus, div:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+}
