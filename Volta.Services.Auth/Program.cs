@@ -49,7 +49,7 @@ using (var scope = app.Services.CreateScope())
             context.Users.Add(defaultAdmin);
             context.SaveChanges();
             
-            Console.WriteLine("Default Admin User created successfully! (admin@volta.com / Admin@123)");
+            Console.WriteLine("Default Admin User created successfully!");
         }
     }
     catch (Exception ex)
